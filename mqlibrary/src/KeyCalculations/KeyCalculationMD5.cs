@@ -13,6 +13,15 @@ public class KeyCalculationMD5 : IKeyCalculation
     /// <summary>
     /// 
     /// </summary>
+    public string CalculateHash(string method, string path)
+    {
+        var fullpath = Path.Combine(method, path);
+        return CalculateHash(fullpath);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public string CalculateHash(string input)
     {
         using (MD5 md5 = MD5.Create())
