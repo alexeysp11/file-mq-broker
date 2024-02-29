@@ -21,7 +21,7 @@ It is necessary to implement two versions that implement the solution to the pro
 - Think through various possible errors, for example:
      - broker unavailability (no catalog in our implementation),
      - caller timeouts (scenario: two callers with one request with a time difference of 1 minute, response 1.5 minutes from the first request, and callers timeout - 1 minute),
-     - service crash and restart (what to do with the queue?),
+     - service crash and restart (the queue can be restored using records in the database),
      - error in response format,
      - impossibility of deleting a response and/or request.
 - Calculate the key for saving the file using the MD5 formula (HTTP method + HTTP path). This key should not be confused with the key used for query collapsing, as it is at the discretion of the developer.
