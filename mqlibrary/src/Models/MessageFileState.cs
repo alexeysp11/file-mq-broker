@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace FileMqBroker.MqLibrary.Models;
 
 /// <summary>
