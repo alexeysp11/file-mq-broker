@@ -1,4 +1,4 @@
-namespace FileMqBroker.MqLibrary.MqAdapters;
+namespace FileMqBroker.MqLibrary.ServerAdapters;
 
 public interface IServerAdapter
 {
