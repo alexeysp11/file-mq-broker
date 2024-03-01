@@ -28,10 +28,11 @@ public class MessageFileDAL
     /// </summary>
     public List<MessageFile> GetMessageFileInfo(IReadOnlyList<string> filenames)
     {
-        var sqlQuery = GetSqlQueryByFileNames(filenames);
+        var sqlQuery = GenerateSqlQueryByFileNames(filenames);
+
         using (var connection = new SQLiteConnection(m_connectionString))
         {
-            var result = connection.Query<MessageFile>(sqlQuery).ToList();
+            var result = connection.Query<MessageFile>(sqlQuery.Query, sqlQuery.Parameters).ToList();
             return result;
         }
     }
@@ -47,19 +48,27 @@ public class MessageFileDAL
     /// <summary>
     /// Method for generating an SQL query using a file name filter.
     /// </summary>
-    private string GetSqlQueryByFileNames(IReadOnlyList<string> filenames)
+    private (string Query, DynamicParameters Parameters) GenerateSqlQueryByFileNames(IReadOnlyList<string> filenames)
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.Append(m_defaultSelectAllSQL);
 
         if (filenames != null && filenames.Count > 0)
         {
-            var fileNamesFilter = string.Join(",", filenames.Select(f => $"'{f}'"));
+            var fileNamesFilter = string.Join(",", filenames.Select((f, index) => $"@FileName{index}"));
             stringBuilder.Append(" WHERE m.Name IN (").Append(fileNamesFilter).Append(")");
+
+            var parameters = new DynamicParameters();
+            for (int i = 0; i < filenames.Count; i++)
+            {
+                parameters.Add($"FileName{i}", filenames[i]);
+            }
+
+            stringBuilder.Append(";");
+            return (stringBuilder.ToString(), parameters);
         }
 
         stringBuilder.Append(";");
-        
-        return stringBuilder.ToString();
+        return (stringBuilder.ToString(), null);
     }
 }
