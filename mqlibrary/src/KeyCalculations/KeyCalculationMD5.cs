@@ -6,12 +6,12 @@ using System.Text;
 namespace FileMqBroker.MqLibrary.KeyCalculations;
 
 /// <summary>
-/// 
+/// Provides MD5 hash calculation functionality.
 /// </summary>
 public class KeyCalculationMD5 : IKeyCalculation
 {
     /// <summary>
-    /// 
+    /// Calculates the MD5 hash based on the method and path.
     /// </summary>
     public string CalculateHash(string method, string path)
     {
@@ -20,7 +20,7 @@ public class KeyCalculationMD5 : IKeyCalculation
     }
 
     /// <summary>
-    /// 
+    /// Calculates the MD5 hash based on the input string.
     /// </summary>
     public string CalculateHash(string input)
     {
