@@ -50,25 +50,38 @@ public class MessageFileDAL
     /// </summary>
     private (string Query, DynamicParameters Parameters) GenerateSqlQueryByFileNames(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
     {
+        if (pageSize <= 0)
+            throw new System.ArgumentException("Page size should be greater than zero", nameof(pageSize));
+        if (pageNumber <= 0)
+            throw new System.ArgumentException("Page number should be greater than zero", nameof(pageNumber));
+        
         var stringBuilder = new StringBuilder();
         stringBuilder.Append(m_defaultSelectAllSQL);
 
+        var parameters = new DynamicParameters();
         if (filenames != null && filenames.Count > 0)
         {
-            var fileNamesFilter = string.Join(",", filenames.Select((f, index) => $"@FileName{index}"));
-            stringBuilder.Append(" WHERE m.Name IN (").Append(fileNamesFilter).Append(")");
-        }
+            // Calculate the start and end indexes for the current page.
+            int startIndex = (pageNumber - 1) * pageSize;
+            int endIndex = Math.Min(startIndex + pageSize, filenames.Count);
+            if (startIndex >= endIndex)
+                throw new System.IndexOutOfRangeException("Failed pagination: start index could not be bigger than end index");
 
-        stringBuilder.Append($" LIMIT @PageSize OFFSET @Offset;");
-
-        var parameters = new DynamicParameters();
-        for (int i = 0; i < filenames.Count; i++)
-        {
-            parameters.Add($"FileName{i}", filenames[i]);
+            // Generate the WHERE condition and dynamic parameters in a loop using the calculated indexes.
+            // The loop is used to optimize the WHERE clause and reduce memory allocation.
+            stringBuilder.Append(" WHERE m.Name IN (");
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                stringBuilder.Append($"@FileName{i}");
+                if (i < endIndex - 1)
+                    stringBuilder.Append(", ");
+                
+                parameters.Add($"FileName{i}", filenames[i]);
+            }
+            stringBuilder.Append(")");
         }
-        parameters.Add("@PageSize", pageSize);
-        parameters.Add("@Offset", pageSize * (pageNumber - 1));
         
+        stringBuilder.Append(";");
         return (stringBuilder.ToString(), parameters);
     }
 }
