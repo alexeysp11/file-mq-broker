@@ -34,6 +34,9 @@ public enum MessageFileState
     [Display(Name = "Failed to Delete")]
     FailedToDelete,
     
+    [Display(Name = "Processed")]
+    Processed,
+    
     [Display(Name = "Deleted")]
     Deleted
 }
