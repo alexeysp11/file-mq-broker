@@ -24,9 +24,17 @@ public class MessageFileDAL
     }
 
     /// <summary>
+    /// Method for updating file information.
+    /// </summary>
+    public void UpdateMessageFileInfo()
+    {
+        // 
+    }
+
+    /// <summary>
     /// Method for obtaining information about files.
     /// </summary>
-    public List<MessageFile> GetMessageFileInfo(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
+    public IReadOnlyList<MessageFile> GetMessageFileInfo(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
     {
         var sqlQuery = GenerateSqlQueryByFileNames(filenames, pageSize, pageNumber);
 
@@ -35,14 +43,6 @@ public class MessageFileDAL
             var result = connection.Query<MessageFile>(sqlQuery.Query, sqlQuery.Parameters).ToList();
             return result;
         }
-    }
-
-    /// <summary>
-    /// Method for updating file information.
-    /// </summary>
-    public void UpdateMessageFileInfo()
-    {
-        // 
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class MessageFileDAL
                 throw new System.IndexOutOfRangeException("Failed pagination: start index could not be bigger than end index");
 
             // Generate the WHERE condition and dynamic parameters in a loop using the calculated indexes.
-            // The loop is used to optimize the WHERE clause and reduce memory allocation.
+            // The loop is used to optimize the WHERE clause and reduce memory allocation while filtering.
             stringBuilder.Append(" WHERE m.Name IN (");
             for (int i = startIndex; i < endIndex; i++)
             {
