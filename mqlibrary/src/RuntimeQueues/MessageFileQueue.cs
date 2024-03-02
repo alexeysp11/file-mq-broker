@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using FileMqBroker.MqLibrary.DAL;
 using FileMqBroker.MqLibrary.Models;
 
@@ -15,14 +16,25 @@ public class MessageFileQueue
 {
     #region Private fields
     private readonly string m_directoryName;
-
+    private readonly FieldInfo[] m_privateFields;
     private ConcurrentDictionary<string, MessageFileState> m_messageFiles;
-    private IReadOnlyDictionary<string, MessageFileState> m_cachedMessageFiles;
-
-    private IReadOnlyList<string> m_messageFilesReadyToRead;
-    private IReadOnlyList<string> m_messageFilesReadyToWrite;
-    private IReadOnlyList<string> m_messageFilesFailed;
+    private IReadOnlyDictionary<string, MessageFileState>? m_cachedMessageFiles;
+    private IReadOnlyList<string>? m_cachedMessageFilesReadyToRead;
+    private IReadOnlyList<string>? m_cachedMessageFilesReadyToWrite;
+    private IReadOnlyList<string>? m_cachedMessageFilesFailed;
     #endregion  // Private fields
+    
+    #region Constructors
+    /// <summary>
+    /// Default constructor.
+    /// </summary>
+    public MessageFileQueue(string directoryName)
+    {
+        m_directoryName = directoryName;
+        m_privateFields = GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+        m_messageFiles = new ConcurrentDictionary<string, MessageFileState>();
+    }
+    #endregion  // Constructors
 
     #region Public properties
     /// <summary>
@@ -47,11 +59,11 @@ public class MessageFileQueue
     {
         get
         {
-            if (m_messageFilesReadyToWrite == null)
+            if (m_cachedMessageFilesReadyToRead == null)
             {
-                m_messageFilesReadyToWrite = GetMessageFileList(x => x.Value == MessageFileState.ReadyToRead);
+                m_cachedMessageFilesReadyToRead = GetMessageFileList(x => x.Value == MessageFileState.ReadyToRead);
             }
-            return m_messageFilesReadyToWrite;
+            return m_cachedMessageFilesReadyToRead;
         }
     }
 
@@ -62,11 +74,11 @@ public class MessageFileQueue
     {
         get
         {
-            if (m_messageFilesReadyToWrite == null)
+            if (m_cachedMessageFilesReadyToWrite == null)
             {
-                m_messageFilesReadyToWrite = GetMessageFileList(x => x.Value == MessageFileState.ReadyToWrite);
+                m_cachedMessageFilesReadyToWrite = GetMessageFileList(x => x.Value == MessageFileState.ReadyToWrite);
             }
-            return m_messageFilesReadyToWrite;
+            return m_cachedMessageFilesReadyToWrite;
         }
     }
 
@@ -77,34 +89,22 @@ public class MessageFileQueue
     {
         get
         {
-            if (m_messageFilesFailed == null)
+            if (m_cachedMessageFilesFailed == null)
             {
-                m_messageFilesFailed = GetMessageFileList(x => x.Value == MessageFileState.FailedToWrite
+                m_cachedMessageFilesFailed = GetMessageFileList(x => x.Value == MessageFileState.FailedToWrite
                     || x.Value == MessageFileState.FailedToRead
                     || x.Value == MessageFileState.FailedToDelete);
             }
-            return m_messageFilesFailed;
+            return m_cachedMessageFilesFailed;
         }
     }
     #endregion  // Public properties
-
-    #region Constructors
-    /// <summary>
-    /// Default constructor.
-    /// </summary>
-    public MessageFileQueue(string directoryName)
-    {
-        m_directoryName = directoryName;
-        m_messageFiles = new ConcurrentDictionary<string, MessageFileState>();
-    }
-    #endregion  // Constructors
 
     #region Private methods
     /// <summary>
     /// Gets a list of files from the queue based on a given condition.
     /// </summary>
-    private IReadOnlyList<string> GetMessageFileList(
-        Func<KeyValuePair<string, MessageFileState>, bool> whereClause)
+    private IReadOnlyList<string> GetMessageFileList(Func<KeyValuePair<string, MessageFileState>, bool> whereClause)
     {
         return MessageFiles.Where(whereClause).Select(x => x.Key).ToList();
     }
@@ -114,10 +114,13 @@ public class MessageFileQueue
     /// </summary>
     private void ClearCacheFields()
     {
-        m_cachedMessageFiles = null;
-        m_messageFilesReadyToRead = null;
-        m_messageFilesReadyToWrite = null;
-        m_messageFilesFailed = null;
+        foreach (var field in m_privateFields)
+        {
+            if (field.Name.StartsWith("m_cached"))
+            {
+                field.SetValue(this, null);
+            }
+        }
     }
     #endregion  // Private methods
 }
