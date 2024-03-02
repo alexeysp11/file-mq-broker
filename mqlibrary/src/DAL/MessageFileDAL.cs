@@ -26,9 +26,9 @@ public class MessageFileDAL
     /// <summary>
     /// Method for obtaining information about files.
     /// </summary>
-    public List<MessageFile> GetMessageFileInfo(IReadOnlyList<string> filenames)
+    public List<MessageFile> GetMessageFileInfo(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
     {
-        var sqlQuery = GenerateSqlQueryByFileNames(filenames);
+        var sqlQuery = GenerateSqlQueryByFileNames(filenames, pageSize, pageNumber);
 
         using (var connection = new SQLiteConnection(m_connectionString))
         {
@@ -46,9 +46,9 @@ public class MessageFileDAL
     }
 
     /// <summary>
-    /// Method for generating an SQL query using a file name filter.
+    /// Method for generating an SQL query using a file name filter with pagination.
     /// </summary>
-    private (string Query, DynamicParameters Parameters) GenerateSqlQueryByFileNames(IReadOnlyList<string> filenames)
+    private (string Query, DynamicParameters Parameters) GenerateSqlQueryByFileNames(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.Append(m_defaultSelectAllSQL);
@@ -57,18 +57,18 @@ public class MessageFileDAL
         {
             var fileNamesFilter = string.Join(",", filenames.Select((f, index) => $"@FileName{index}"));
             stringBuilder.Append(" WHERE m.Name IN (").Append(fileNamesFilter).Append(")");
-
-            var parameters = new DynamicParameters();
-            for (int i = 0; i < filenames.Count; i++)
-            {
-                parameters.Add($"FileName{i}", filenames[i]);
-            }
-
-            stringBuilder.Append(";");
-            return (stringBuilder.ToString(), parameters);
         }
 
-        stringBuilder.Append(";");
-        return (stringBuilder.ToString(), null);
+        stringBuilder.Append($" LIMIT @PageSize OFFSET @Offset;");
+
+        var parameters = new DynamicParameters();
+        for (int i = 0; i < filenames.Count; i++)
+        {
+            parameters.Add($"FileName{i}", filenames[i]);
+        }
+        parameters.Add("@PageSize", pageSize);
+        parameters.Add("@Offset", pageSize * (pageNumber - 1));
+        
+        return (stringBuilder.ToString(), parameters);
     }
 }
