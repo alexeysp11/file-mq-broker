@@ -116,7 +116,7 @@ public class MessageFileQueue
     {
         foreach (var field in m_privateFields)
         {
-            if (field.Name.StartsWith("m_cached"))
+            if (field.Name.StartsWith("m_cachedMessageFiles"))
             {
                 field.SetValue(this, null);
             }
