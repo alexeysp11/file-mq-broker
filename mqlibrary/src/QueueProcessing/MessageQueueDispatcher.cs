@@ -11,7 +11,7 @@ namespace FileMqBroker.MqLibrary.QueueProcessing;
 /// <summary>
 /// Performs a key mediator role within message queue processing.
 /// </summary>
-public class MessageQueueDispatcher
+public class MessageQueueDispatcher : IProducerMessageQueueDispatcher, IConsumerMessageQueueDispatcher
 {
     private readonly MessageFileDAL m_messageFileDAL;
     private readonly FileHandler m_fileHandler;
@@ -43,15 +43,23 @@ public class MessageQueueDispatcher
         {
             ThreadPool.QueueUserWorkItem(state =>
             {
-                ProcessFile(fileName);
+                ProcessFileCreate(fileName);
             });
         }
     }
 
     /// <summary>
-    /// Performs processing of the specified file at the file creation level in the directory.
+    /// Method for processing the message queue from the consumer side.
     /// </summary>
-    private void ProcessFile(string fileName)
+    public void ProcessConsumer()
+    {
+        // 
+    }
+
+    /// <summary>
+    /// Performs processing of the specified file (create the file in the directory).
+    /// </summary>
+    private void ProcessFileCreate(string fileName)
     {
         try
         {
