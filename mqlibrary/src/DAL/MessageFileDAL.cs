@@ -24,9 +24,9 @@ public class MessageFileDAL
     }
 
     /// <summary>
-    /// Method for updating file information.
+    /// Method for updating state of the specified files.
     /// </summary>
-    public void UpdateMessageFileInfo()
+    public void UpdateMessageFileState(List<string> fileNames, MessageFileState targetState)
     {
         // 
     }
