@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace FileMqBroker.MqLibrary.ClientAdapters;
+namespace FileMqBroker.MqLibrary.DirectoryOperations;
 
 /// <summary>
 /// Class for working with files.

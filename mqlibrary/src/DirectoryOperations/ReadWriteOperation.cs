@@ -1,4 +1,4 @@
-namespace FileMqBroker.MqLibrary.ClientAdapters;
+namespace FileMqBroker.MqLibrary.DirectoryOperations;
 
 /// <summary>
 /// 
