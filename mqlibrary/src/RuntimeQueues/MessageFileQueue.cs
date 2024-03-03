@@ -100,6 +100,16 @@ public class MessageFileQueue
     }
     #endregion  // Public properties
 
+    #region Public methods
+    /// <summary>
+    /// 
+    /// </summary>
+    public List<string> DequeueMessages(int count)
+    {
+        return new List<string>();
+    }
+    #endregion  //  Public methods
+
     #region Private methods
     /// <summary>
     /// Gets a list of files from the queue based on a given condition.
