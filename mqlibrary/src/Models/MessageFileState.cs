@@ -7,6 +7,12 @@ namespace FileMqBroker.MqLibrary.Models;
 /// </summary>
 public enum MessageFileState
 {
+    [Display(Name = "Undefined")]
+    Undefined,
+
+    [Display(Name = "Created")]
+    Created,
+
     [Display(Name = "Reading")]
     Reading,
 
