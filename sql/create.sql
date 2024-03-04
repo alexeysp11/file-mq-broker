@@ -1,22 +1,11 @@
 CREATE TABLE MessageFiles (
     MessageFileId INTEGER PRIMARY KEY,
     Name TEXT NOT NULL,
-    MessageFileState TEXT NOT NULL
-);
-
-CREATE TABLE FileContents (
-    FileContentsId INTEGER PRIMARY KEY,
-    MessageFileId INTEGER NOT NULL,
     Content BLOB,
-    FOREIGN KEY (MessageFileId) REFERENCES MessageFiles(MessageFileId)
-);
-
-CREATE TABLE FileMetadata (
-    FileMetadataId INTEGER PRIMARY KEY,
-    MessageFileId INTEGER NOT NULL,
+    ContentText TEXT,
     Size INTEGER,
     CreatedAt DATETIME,
-    FOREIGN KEY (MessageFileId) REFERENCES MessageFiles(MessageFileId)
+    MessageFileState TEXT NOT NULL
 );
 
 CREATE TABLE FileStateHistory (
@@ -25,4 +14,11 @@ CREATE TABLE FileStateHistory (
     NewState TEXT NOT NULL,
     Timestamp DATETIME,
     FOREIGN KEY (MessageFileId) REFERENCES MessageFiles(MessageFileId)
+);
+
+CREATE TABLE ExceptionLog (
+    Id INTEGER PRIMARY KEY,
+    ExceptionMessage TEXT NOT NULL,
+    StackTrace TEXT NOT NULL,
+    Timestamp DATETIME NOT NULL
 );
