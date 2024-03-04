@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using FileMqBroker.MqLibrary.DAL;
 using FileMqBroker.MqLibrary.Models;
 
@@ -12,125 +11,83 @@ namespace FileMqBroker.MqLibrary.RuntimeQueues;
 /// <summary>
 /// A class that allows you to manage a message queue within an application instance.
 /// </summary>
-public class MessageFileQueue
+public class MessageFileQueue : IMessageFileQueue, IReqMessageFileQueue, IRespMessageFileQueue
 {
-    #region Private fields
-    private readonly string m_directoryName;
-    private readonly FieldInfo[] m_privateFields;
-    private ConcurrentDictionary<string, MessageFileState> m_messageFiles;
-    private IReadOnlyDictionary<string, MessageFileState>? m_cachedMessageFiles;
-    private IReadOnlyList<string>? m_cachedMessageFilesReadyToRead;
-    private IReadOnlyList<string>? m_cachedMessageFilesReadyToWrite;
-    private IReadOnlyList<string>? m_cachedMessageFilesFailed;
-    #endregion  // Private fields
+    private ConcurrentQueue<MessageFile> m_messageQueue;
+    private ConcurrentQueue<MessageFile> m_loggingQueue;
+    private ConcurrentQueue<string> m_exceptionQueue;
     
-    #region Constructors
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public MessageFileQueue(string directoryName)
+    public MessageFileQueue()
     {
-        m_directoryName = directoryName;
-        m_privateFields = GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-        m_messageFiles = new ConcurrentDictionary<string, MessageFileState>();
+        m_messageQueue = new ConcurrentQueue<MessageFile>();
+        m_loggingQueue = new ConcurrentQueue<MessageFile>();
+        m_exceptionQueue = new ConcurrentQueue<string>();
     }
-    #endregion  // Constructors
-
-    #region Public properties
+    
     /// <summary>
-    /// A cached, immutable copy of the message queue.
+    /// Enqueues a message into the message queue.
     /// </summary>
-    public IReadOnlyDictionary<string, MessageFileState> MessageFiles
+    public void EnqueueMessage(MessageFile message)
     {
-        get
+        m_messageQueue.Enqueue(message);
+    }
+
+    /// <summary>
+    /// Dequeues a specified number of messages from the message queue.
+    /// </summary>
+    public List<MessageFile> DequeueMessages(int count)
+    {
+        return DequeueItems(m_messageQueue, count);
+    }
+
+    /// <summary>
+    /// Enqueues a message into the logging queue.
+    /// </summary>
+    public void EnqueueMessageLogging(MessageFile message)
+    {
+        m_loggingQueue.Enqueue(message);
+    }
+
+    /// <summary>
+    /// Dequeues a specified number of messages from the logging queue.
+    /// </summary>
+    public List<MessageFile> DequeueMessagesLogging(int count)
+    {
+        return DequeueItems(m_loggingQueue, count);
+    }
+
+    /// <summary>
+    /// Enqueues an exception message into the exception logging queue.
+    /// </summary>
+    public void EnqueueExceptionLogging(string exceptionMessage)
+    {
+        m_exceptionQueue.Enqueue(exceptionMessage);
+    }
+
+    /// <summary>
+    /// Dequeues a specified number of exception messages from the exception logging queue.
+    /// </summary>
+    public List<string> DequeueExceptionLogging(int count)
+    {
+        return DequeueItems(m_exceptionQueue, count);
+    }
+
+    private List<T> DequeueItems<T>(ConcurrentQueue<T> queue, int count)
+    {
+        var items = new List<T>();
+        int remainingCount = count;
+
+        while (remainingCount > 0 && queue.Count > 0)
         {
-            if (m_cachedMessageFiles == null)
+            if (queue.TryDequeue(out T item))
             {
-                m_cachedMessageFiles = new Dictionary<string, MessageFileState>(m_messageFiles);
-            }
-            return m_cachedMessageFiles;
-        }
-    }
-
-    /// <summary>
-    /// List of queued files that are ready to be read.
-    /// </summary>
-    public IReadOnlyList<string> MessageFilesReadyToRead
-    {
-        get
-        {
-            if (m_cachedMessageFilesReadyToRead == null)
-            {
-                m_cachedMessageFilesReadyToRead = GetMessageFileList(x => x.Value == MessageFileState.ReadyToRead);
-            }
-            return m_cachedMessageFilesReadyToRead;
-        }
-    }
-
-    /// <summary>
-    /// List of queued files that are ready to be written.
-    /// </summary>
-    public IReadOnlyList<string> MessageFilesReadyToWrite
-    {
-        get
-        {
-            if (m_cachedMessageFilesReadyToWrite == null)
-            {
-                m_cachedMessageFilesReadyToWrite = GetMessageFileList(x => x.Value == MessageFileState.ReadyToWrite);
-            }
-            return m_cachedMessageFilesReadyToWrite;
-        }
-    }
-
-    /// <summary>
-    /// List of files from the queue whose processing is in an error state.
-    /// </summary>
-    public IReadOnlyList<string> MessageFilesFailed
-    {
-        get
-        {
-            if (m_cachedMessageFilesFailed == null)
-            {
-                m_cachedMessageFilesFailed = GetMessageFileList(x => x.Value == MessageFileState.FailedToWrite
-                    || x.Value == MessageFileState.FailedToRead
-                    || x.Value == MessageFileState.FailedToDelete);
-            }
-            return m_cachedMessageFilesFailed;
-        }
-    }
-    #endregion  // Public properties
-
-    #region Public methods
-    /// <summary>
-    /// 
-    /// </summary>
-    public List<string> DequeueMessages(int count)
-    {
-        return new List<string>();
-    }
-    #endregion  //  Public methods
-
-    #region Private methods
-    /// <summary>
-    /// Gets a list of files from the queue based on a given condition.
-    /// </summary>
-    private IReadOnlyList<string> GetMessageFileList(Func<KeyValuePair<string, MessageFileState>, bool> whereClause)
-    {
-        return MessageFiles.Where(whereClause).Select(x => x.Key).ToList();
-    }
-
-    /// <summary>
-    /// Clears fields that contain cached values.
-    /// </summary>
-    private void ClearCacheFields()
-    {
-        foreach (var field in m_privateFields)
-        {
-            if (field.Name.StartsWith("m_cachedMessageFiles"))
-            {
-                field.SetValue(this, null);
+                items.Add(item);
+                remainingCount--;
             }
         }
+        return items;
     }
-    #endregion  // Private methods
 }
