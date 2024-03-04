@@ -15,7 +15,9 @@ public class MessageQueueDispatcher : IProducerMessageQueueDispatcher, IConsumer
 {
     private readonly string m_requestDirectoryName;
     private readonly string m_responseDirectoryName;
+    private readonly int m_oneTimeProcQueueElements;
     private readonly MessageFileDAL m_messageFileDAL;
+    private readonly ExceptionDAL exceptionDAL;
     private readonly FileHandler m_fileHandler;
     private readonly MessageFileQueue m_messageFileQueue;
 
@@ -24,10 +26,12 @@ public class MessageQueueDispatcher : IProducerMessageQueueDispatcher, IConsumer
     /// </summary>
     public MessageQueueDispatcher(
         AppInitConfigs appInitConfigs, 
-        MessageFileDAL messageFileDAL, 
+        MessageFileDAL messageFileDAL,
+        ExceptionDAL exceptionDAL,
         FileHandler fileHandler, 
         MessageFileQueue messageFileQueue)
     {
+        m_oneTimeProcQueueElements = appInitConfigs.OneTimeProcQueueElements;
         m_requestDirectoryName = appInitConfigs.RequestDirectoryName;
         m_responseDirectoryName = appInitConfigs.ResponseDirectoryName;
         m_messageFileDAL = messageFileDAL;
@@ -40,20 +44,40 @@ public class MessageQueueDispatcher : IProducerMessageQueueDispatcher, IConsumer
     /// </summary>
     public void ProcessProducer()
     {
-        var fileMessages = m_messageFileQueue.DequeueMessages(10000);
-
+        // 
+        var fileMessages = m_messageFileQueue.DequeueMessages(m_oneTimeProcQueueElements);
         ThreadPool.QueueUserWorkItem(state =>
         {
-            m_messageFileDAL.UpdateMessageFileState(fileMessages, MessageFileState.Reading);
+            foreach (var fileMessage in fileMessages)
+            {
+                fileMessage.MessageFileState = MessageFileState.Reading;
+            }
+            m_messageFileDAL.UpdateMessageFileState(fileMessages);
+        });
+        var processingTasks = new Task[fileMessages.Count];
+        for (int i = 0; i < fileMessages.Count; i++)
+        {
+            Task task = Task.Run(() =>
+            {
+                ProcessFileCreateRequest(fileMessages[i]);
+            });
+            processingTasks[i] = task;
+        }
+        Task.WaitAll(processingTasks);
+
+        // 
+        var logggingMessages = m_messageFileQueue.DequeueMessagesLogging(m_oneTimeProcQueueElements);
+        ThreadPool.QueueUserWorkItem(state =>
+        {
+            m_messageFileDAL.UpdateMessageFileState(logggingMessages);
         });
 
-        foreach (var fileMessage in fileMessages)
+        // 
+        var exceptions = m_messageFileQueue.DequeueExceptionLogging(m_oneTimeProcQueueElements);
+        ThreadPool.QueueUserWorkItem(state =>
         {
-            ThreadPool.QueueUserWorkItem(state =>
-            {
-                ProcessFileCreateRequest(fileMessage);
-            });
-        }
+            exceptionDAL.InsertExceptions(exceptions);
+        });
     }
 
     /// <summary>
