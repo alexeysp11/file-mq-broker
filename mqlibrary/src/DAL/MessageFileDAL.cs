@@ -12,15 +12,28 @@ namespace FileMqBroker.MqLibrary.DAL;
 /// </summary>
 public class MessageFileDAL
 {
+    #region Private fields
     private readonly string m_connectionString;
     private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.MessageFileState FROM MessageFiles m";
+    #endregion  // Private fields
 
+    #region Constructors
     /// <summary>
     /// Default constructor.
     /// </summary>
     public MessageFileDAL(string connectionString)
     {
         m_connectionString = connectionString;
+    }
+    #endregion  // Constructors
+
+    #region Public methods
+    /// <summary>
+    /// Method for creating the specified files in DB.
+    /// </summary>
+    public void CreateMessageFileState(List<string> fileNames, MessageFileState targetState = MessageFileState.Created)
+    {
+        // 
     }
 
     /// <summary>
@@ -44,7 +57,9 @@ public class MessageFileDAL
             return result;
         }
     }
+    #endregion  // Public methods
 
+    #region Private methods
     /// <summary>
     /// Method for generating an SQL query using a file name filter with pagination.
     /// </summary>
@@ -84,4 +99,5 @@ public class MessageFileDAL
         stringBuilder.Append(";");
         return (stringBuilder.ToString(), parameters);
     }
+    #endregion  // Private methods
 }
