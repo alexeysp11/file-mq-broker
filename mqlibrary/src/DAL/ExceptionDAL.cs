@@ -1,7 +1,13 @@
+using System.Data;
+using System.Data.SQLite;
+using System.Text;
+using Dapper;
+using FileMqBroker.MqLibrary.Models;
+
 namespace FileMqBroker.MqLibrary.DAL;
 
 /// <summary>
-/// 
+/// Allows you to add information about exceptions to the database.
 /// </summary>
 public class ExceptionDAL
 {
@@ -10,8 +16,8 @@ public class ExceptionDAL
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public ExceptionDAL(string connectionString)
+    public ExceptionDAL(AppInitConfigs appInitConfigs)
     {
-        m_connectionString = connectionString;
+        m_connectionString = appInitConfigs.DbConnectionString;
     }
 }

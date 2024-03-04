@@ -21,9 +21,9 @@ public class MessageFileDAL
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public MessageFileDAL(string connectionString)
+    public MessageFileDAL(AppInitConfigs appInitConfigs)
     {
-        m_connectionString = connectionString;
+        m_connectionString = appInitConfigs.DbConnectionString;
     }
     #endregion  // Constructors
 
@@ -31,7 +31,7 @@ public class MessageFileDAL
     /// <summary>
     /// Method for creating the specified files in DB.
     /// </summary>
-    public void CreateMessageFileState(List<string> fileNames, MessageFileState targetState = MessageFileState.Created)
+    public void CreateMessageFileState(List<MessageFile> fileMessages, MessageFileState targetState = MessageFileState.Created)
     {
         // 
     }
@@ -39,7 +39,7 @@ public class MessageFileDAL
     /// <summary>
     /// Method for updating state of the specified files.
     /// </summary>
-    public void UpdateMessageFileState(List<string> fileNames, MessageFileState targetState)
+    public void UpdateMessageFileState(List<MessageFile> fileMessages, MessageFileState targetState)
     {
         // 
     }
