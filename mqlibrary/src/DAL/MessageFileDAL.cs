@@ -39,7 +39,7 @@ public class MessageFileDAL
     /// <summary>
     /// Method for updating state of the specified files.
     /// </summary>
-    public void UpdateMessageFileState(List<MessageFile> fileMessages, MessageFileState targetState)
+    public void UpdateMessageFileState(List<MessageFile> fileMessages)
     {
         // 
     }

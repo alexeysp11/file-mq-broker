@@ -20,4 +20,9 @@ public class ExceptionDAL
     {
         m_connectionString = appInitConfigs.DbConnectionString;
     }
+
+    public void InsertExceptions(List<string> exceptions)
+    {
+        // 
+    }
 }
