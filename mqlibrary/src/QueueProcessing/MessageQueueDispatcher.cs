@@ -13,6 +13,8 @@ namespace FileMqBroker.MqLibrary.QueueProcessing;
 /// </summary>
 public class MessageQueueDispatcher : IProducerMessageQueueDispatcher, IConsumerMessageQueueDispatcher
 {
+    private readonly string m_requestDirectoryName;
+    private readonly string m_responseDirectoryName;
     private readonly MessageFileDAL m_messageFileDAL;
     private readonly FileHandler m_fileHandler;
     private readonly MessageFileQueue m_messageFileQueue;
@@ -20,8 +22,14 @@ public class MessageQueueDispatcher : IProducerMessageQueueDispatcher, IConsumer
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public MessageQueueDispatcher(MessageFileDAL messageFileDAL, FileHandler fileHandler, MessageFileQueue messageFileQueue)
+    public MessageQueueDispatcher(
+        AppInitConfigs appInitConfigs, 
+        MessageFileDAL messageFileDAL, 
+        FileHandler fileHandler, 
+        MessageFileQueue messageFileQueue)
     {
+        m_requestDirectoryName = appInitConfigs.RequestDirectoryName;
+        m_responseDirectoryName = appInitConfigs.ResponseDirectoryName;
         m_messageFileDAL = messageFileDAL;
         m_fileHandler = fileHandler;
         m_messageFileQueue = messageFileQueue;
@@ -32,18 +40,18 @@ public class MessageQueueDispatcher : IProducerMessageQueueDispatcher, IConsumer
     /// </summary>
     public void ProcessProducer()
     {
-        List<string> fileNames = m_messageFileQueue.DequeueMessages(10000); 
+        var fileMessages = m_messageFileQueue.DequeueMessages(10000);
 
         ThreadPool.QueueUserWorkItem(state =>
         {
-            m_messageFileDAL.UpdateMessageFileState(fileNames, MessageFileState.Reading);
+            m_messageFileDAL.UpdateMessageFileState(fileMessages, MessageFileState.Reading);
         });
 
-        foreach (string fileName in fileNames)
+        foreach (var fileMessage in fileMessages)
         {
             ThreadPool.QueueUserWorkItem(state =>
             {
-                ProcessFileCreate(fileName);
+                ProcessFileCreateRequest(fileMessage);
             });
         }
     }
@@ -59,18 +67,24 @@ public class MessageQueueDispatcher : IProducerMessageQueueDispatcher, IConsumer
     /// <summary>
     /// Performs processing of the specified file (create the file in the directory).
     /// </summary>
-    private void ProcessFileCreate(string fileName)
+    private void ProcessFileCreateRequest(MessageFile fileMessage)
     {
+        var fileName = fileMessage.Name;
+        var fileContent = fileMessage.Content;
         try
         {
             m_fileHandler.CreateFile(fileName);
-            m_fileHandler.WriteToFile(fileName, "Sample data");
-
-            Console.WriteLine($"File {fileName} processed successfully.");
+            m_fileHandler.WriteToFile(fileName, fileContent);
+            fileMessage.MessageFileState = MessageFileState.ReadyToRead;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error processing file {fileName}: {ex.Message}");
+            fileMessage.MessageFileState = MessageFileState.FailedToWrite;
+            m_messageFileQueue.EnqueueExceptionLogging($"Error processing file {fileName}: {ex.Message}");
+        }
+        finally
+        {
+            m_messageFileQueue.EnqueueMessageLogging(fileMessage);
         }
     }
 }
