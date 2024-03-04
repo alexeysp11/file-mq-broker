@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace FileMqBroker.MqLibrary.Models;
 
 /// <summary>
-/// The state of the file that contains the message.
+/// The state of the message file.
 /// </summary>
 public enum MessageFileState
 {
