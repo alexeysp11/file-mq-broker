@@ -52,7 +52,7 @@ public class MessageQueueDispatcher : IProducerMessageQueueDispatcher, IConsumer
             {
                 fileMessage.MessageFileState = MessageFileState.Reading;
             }
-            m_messageFileDAL.UpdateMessageFileState(fileMessages);
+            m_messageFileDAL.InsertMessageFileState(fileMessages);
         });
         var processingTasks = new Task[fileMessages.Count];
         for (int i = 0; i < fileMessages.Count; i++)

@@ -47,7 +47,12 @@ public class MessageFileDAL
     /// </summary>
     public void UpdateMessageFileState(IReadOnlyList<MessageFile> fileMessages)
     {
-        // 
+        var sqlQuery = GenerateUpdateSqlByFileNames(fileMessages);
+
+        using (var connection = new SQLiteConnection(m_connectionString))
+        {
+            connection.Execute(sqlQuery.Query, sqlQuery.Parameters);
+        }
     }
 
     /// <summary>
@@ -88,6 +93,28 @@ public class MessageFileDAL
             queryParameters.Add($"file_{i}_Content", fileMessages[i].Content);
             queryParameters.Add($"file_{i}_FileType", fileMessages[i].MessageFileType);
             queryParameters.Add($"file_{i}_FileState", fileMessages[i].MessageFileState);
+        }
+
+        return (stringBuilder.ToString(), queryParameters);
+    }
+
+    /// <summary>
+    /// Method for generating an SQL query for updating data about a file.
+    /// </summary>
+    private (string Query, DynamicParameters Parameters) GenerateUpdateSqlByFileNames(IReadOnlyList<MessageFile> fileMessages)
+    {
+        if (fileMessages == null)
+            throw new System.ArgumentNullException(nameof(fileMessages));
+        
+        var queryParameters = new DynamicParameters();
+        var stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < fileMessages.Count; i++)
+        {
+            stringBuilder.Append($"UPDATE MessageFiles SET MessageFileState = @MessageFileState_{i} WHERE Name = @Name_{i};");
+            
+            queryParameters.Add($"MessageFileState_{i}", fileMessages[i].MessageFileState);
+            queryParameters.Add($"Name_{i}", fileMessages[i].Name);
         }
 
         return (stringBuilder.ToString(), queryParameters);
