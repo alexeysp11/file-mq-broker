@@ -8,12 +8,12 @@ public class MessageFile
     /// <summary>
     /// The name of the message file.
     /// </summary>
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     /// The content of the message file.
     /// </summary>
-    public string Content { get; set; }
+    public string? Content { get; set; }
     
     /// <summary>
     /// The type of the message file.

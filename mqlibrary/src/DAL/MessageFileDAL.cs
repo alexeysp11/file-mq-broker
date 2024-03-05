@@ -15,7 +15,7 @@ public class MessageFileDAL
     #region Private fields
     private readonly string m_connectionString;
     private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.MessageFileState FROM MessageFiles m";
-    private readonly string m_defaultInsertMessageSQL = "INSERT INTO MessageFiles (Name, Content, FileType, FileState) VALUES ";
+    private readonly string m_defaultInsertMessageSQL = "INSERT INTO MessageFiles (Name, FileType, FileState) VALUES ";
     #endregion  // Private fields
 
     #region Constructors
@@ -30,7 +30,7 @@ public class MessageFileDAL
 
     #region Public methods
     /// <summary>
-    /// Method for creating the specified files in DB.
+    /// Method for inserting the specified files in DB.
     /// </summary>
     public void InsertMessageFileState(IReadOnlyList<MessageFile> fileMessages)
     {
@@ -87,10 +87,9 @@ public class MessageFileDAL
         {
             if (i > 0)
                 stringBuilder.Append(", ");
-            stringBuilder.Append($"(@file_{i}_Name, @file_{i}_Content, @file_{i}_FileType, @file_{i}_FileState)");
+            stringBuilder.Append($"(@file_{i}_Name, @file_{i}_FileType, @file_{i}_FileState)");
 
             queryParameters.Add($"file_{i}_Name", fileMessages[i].Name);
-            queryParameters.Add($"file_{i}_Content", fileMessages[i].Content);
             queryParameters.Add($"file_{i}_FileType", fileMessages[i].MessageFileType);
             queryParameters.Add($"file_{i}_FileState", fileMessages[i].MessageFileState);
         }
