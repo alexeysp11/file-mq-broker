@@ -14,6 +14,10 @@ It is necessary to implement two versions that implement the solution to the pro
 
 ### Implementation details
 
+A more detailed diagram demonstrating how a file message broker works is presented below:
+
+![mqlibrary-architechture](docs/img/mqlibrary-architechture.png)
+
 - Use the directory as a broker where the request (method, path) is placed in a file named `query key.req`.
 - The broker's response is expected in the file `request key.resp`, where the first line will be the HTTP code, and the rest is the response body for the caller.
 - After proofreading the response, the response and request files must be deleted from the disk by the service.
