@@ -1,8 +1,6 @@
 CREATE TABLE MessageFiles (
     MessageFileId INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL,
-    Content BLOB,
-    ContentText TEXT,
     Size INTEGER,
     CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     MessageFileState TEXT NOT NULL
