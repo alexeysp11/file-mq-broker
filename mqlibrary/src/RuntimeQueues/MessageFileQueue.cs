@@ -11,7 +11,7 @@ namespace FileMqBroker.MqLibrary.RuntimeQueues;
 /// <summary>
 /// A class that allows you to manage a message queue within an application instance.
 /// </summary>
-public class MessageFileQueue : IMessageFileQueue, IReqMessageFileQueue, IRespMessageFileQueue
+public class MessageFileQueue : IMessageFileQueue, IReadMFQueue, IWriteMFQueue
 {
     private ConcurrentQueue<MessageFile> m_messageQueue;
     private ConcurrentQueue<MessageFile> m_loggingQueue;
