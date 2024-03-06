@@ -11,7 +11,7 @@ namespace FileMqBroker.MqLibrary.QueueDispatchers;
 /// <summary>
 /// Performs a key mediator role within message queue processing.
 /// </summary>
-public interface IMessageQueueDispatcher
+public interface IMqDispatcher
 {
     /// <summary>
     /// Method for processing the message queue.

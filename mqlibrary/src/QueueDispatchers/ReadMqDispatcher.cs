@@ -9,9 +9,9 @@ using FileMqBroker.MqLibrary.RuntimeQueues;
 namespace FileMqBroker.MqLibrary.QueueDispatchers;
 
 /// <summary>
-/// Class for processing the message queue from the producer side.
+/// Class for processing the message queue as a reader.
 /// </summary>
-public class ProducerMessageQueueDispatcher : IMessageQueueDispatcher
+public class ReadMqDispatcher : IMqDispatcher
 {
     private readonly string m_requestDirectoryName;
     private readonly string m_responseDirectoryName;
@@ -24,7 +24,7 @@ public class ProducerMessageQueueDispatcher : IMessageQueueDispatcher
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public ProducerMessageQueueDispatcher(
+    public ReadMqDispatcher(
         AppInitConfigs appInitConfigs, 
         MessageFileDAL messageFileDAL,
         ExceptionDAL exceptionDAL,
@@ -40,31 +40,30 @@ public class ProducerMessageQueueDispatcher : IMessageQueueDispatcher
     }
 
     /// <summary>
-    /// Method for processing the message queue from the producer side.
+    /// Method for processing the message queue from the consumer side.
     /// </summary>
     public void ProcessMessageQueue()
     {
-        // 
-        var fileMessages = m_messageFileQueue.DequeueMessages(m_oneTimeProcQueueElements);
+        var fileMessages = m_messageFileDAL.GetMessageFileInfo(null, 20_000, 1);
         ThreadPool.QueueUserWorkItem(state =>
         {
             foreach (var fileMessage in fileMessages)
             {
-                fileMessage.MessageFileState = MessageFileState.Writing;
+                fileMessage.MessageFileState = MessageFileState.Reading;
+                m_messageFileQueue.EnqueueMessage(fileMessage);
             }
-            m_messageFileDAL.InsertMessageFileState(fileMessages);
         });
         var processingTasks = new Task[fileMessages.Count];
         for (int i = 0; i < fileMessages.Count; i++)
         {
             Task task = Task.Run(() =>
             {
-                ProcessFileCreateRequest(fileMessages[i]);
+                ProcessFileReadRequest(fileMessages[i]);
             });
             processingTasks[i] = task;
         }
         Task.WaitAll(processingTasks);
-
+        
         // 
         var logggingMessages = m_messageFileQueue.DequeueMessagesLogging(m_oneTimeProcQueueElements);
         ThreadPool.QueueUserWorkItem(state =>
@@ -83,19 +82,19 @@ public class ProducerMessageQueueDispatcher : IMessageQueueDispatcher
     /// <summary>
     /// Performs processing of the specified file (create the file in the directory).
     /// </summary>
-    private void ProcessFileCreateRequest(MessageFile fileMessage)
+    private void ProcessFileReadRequest(MessageFile fileMessage)
     {
         var fileName = fileMessage.Name;
         var fileContent = fileMessage.Content;
         try
         {
-            m_fileHandler.CreateFile(fileName);
-            m_fileHandler.WriteToFile(fileName, fileContent);
-            fileMessage.MessageFileState = MessageFileState.ReadyToRead;
+            fileMessage.Content = m_fileHandler.ReadFromFile(fileName);
+            m_fileHandler.DeleteFile(fileName);
+            fileMessage.MessageFileState = MessageFileState.Processed;
         }
         catch (Exception ex)
         {
-            fileMessage.MessageFileState = MessageFileState.FailedToWrite;
+            fileMessage.MessageFileState = MessageFileState.FailedToRead;
             m_messageFileQueue.EnqueueExceptionLogging($"Error processing file {fileName}: {ex.Message}");
         }
         finally
