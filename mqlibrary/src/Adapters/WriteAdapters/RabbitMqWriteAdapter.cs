@@ -1,6 +1,6 @@
 using FileMqBroker.MqLibrary.RuntimeQueues;
 
-namespace FileMqBroker.MqLibrary.WriteAdapters;
+namespace FileMqBroker.MqLibrary.Adapters.WriteAdapters;
 
 /// <summary>
 /// 

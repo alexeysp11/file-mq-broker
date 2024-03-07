@@ -1,7 +1,7 @@
 using FileMqBroker.MqLibrary.Models;
 using FileMqBroker.MqLibrary.RuntimeQueues;
 
-namespace FileMqBroker.MqLibrary.ReadAdapters;
+namespace FileMqBroker.MqLibrary.Adapters.ReadAdapters;
 
 /// <summary>
 /// 
