@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -10,15 +9,6 @@ namespace FileMqBroker.MqLibrary.KeyCalculations;
 /// </summary>
 public class KeyCalculationMD5 : IKeyCalculation
 {
-    /// <summary>
-    /// Calculates the MD5 hash based on the method and path.
-    /// </summary>
-    public string CalculateHash(string method, string path)
-    {
-        var fullpath = Path.Combine(method, path);
-        return CalculateHash(fullpath);
-    }
-
     /// <summary>
     /// Calculates the MD5 hash based on the input string.
     /// </summary>
