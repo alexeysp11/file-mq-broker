@@ -14,6 +14,11 @@ public class MessageFile
     /// The content of the message file.
     /// </summary>
     public string? Content { get; set; }
+
+    /// <summary>
+    /// The advanced hash code of the message file.
+    /// </summary>
+    public string? AdvancedHashCode { get; set; }
     
     /// <summary>
     /// The type of the message file.

@@ -13,6 +13,8 @@ namespace FileMqBroker.MqLibrary.RuntimeQueues;
 /// </summary>
 public class MessageFileQueue : IMessageFileQueue, IReadMFQueue, IWriteMFQueue
 {
+    private readonly DuplicateRequestCollapseType m_collapseType;
+    private ConcurrentDictionary<string, MessageFile> m_messageQueueDictionary;
     private ConcurrentQueue<MessageFile> m_messageQueue;
     private ConcurrentQueue<MessageFile> m_loggingQueue;
     private ConcurrentQueue<string> m_exceptionQueue;
@@ -20,11 +22,32 @@ public class MessageFileQueue : IMessageFileQueue, IReadMFQueue, IWriteMFQueue
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public MessageFileQueue()
+    public MessageFileQueue(AppInitConfigs appInitConfigs)
     {
+        m_collapseType = appInitConfigs.DuplicateRequestCollapseType;
+        m_messageQueueDictionary = new ConcurrentDictionary<string, MessageFile>();
         m_messageQueue = new ConcurrentQueue<MessageFile>();
         m_loggingQueue = new ConcurrentQueue<MessageFile>();
         m_exceptionQueue = new ConcurrentQueue<string>();
+    }
+    
+    /// <summary>
+    /// Implementation of the duplicate request collapse.
+    /// </summary>
+    public DuplicateRequestCollapseType DuplicateRequestCollapseType
+    {
+        get
+        {
+            return m_collapseType;
+        }
+    }
+
+    /// <summary>
+    /// Determines whether an element with the specified key is in the message queue.
+    /// </summary>
+    public bool IsMessageInQueue(string key)
+    {
+        return m_messageQueueDictionary.ContainsKey(key);
     }
     
     /// <summary>
@@ -32,7 +55,18 @@ public class MessageFileQueue : IMessageFileQueue, IReadMFQueue, IWriteMFQueue
     /// </summary>
     public void EnqueueMessage(MessageFile message)
     {
-        m_messageQueue.Enqueue(message);
+        if (m_collapseType == DuplicateRequestCollapseType.Advanced)
+        {
+            if (!IsMessageInQueue(message.AdvancedHashCode))
+            {
+                m_messageQueueDictionary.TryAdd(message.AdvancedHashCode, message);
+                m_messageQueue.Enqueue(message);
+            }
+        }
+        else
+        {
+            m_messageQueue.Enqueue(message);
+        }
     }
 
     /// <summary>
@@ -40,7 +74,20 @@ public class MessageFileQueue : IMessageFileQueue, IReadMFQueue, IWriteMFQueue
     /// </summary>
     public List<MessageFile> DequeueMessages(int count)
     {
-        return DequeueItems(m_messageQueue, count);
+        var messages = DequeueItems(m_messageQueue, count);
+        
+        if (m_collapseType == DuplicateRequestCollapseType.Advanced)
+        {
+            foreach (var message in messages)
+            {
+                if (IsMessageInQueue(message.AdvancedHashCode))
+                {
+                    m_messageQueueDictionary.TryRemove(message.AdvancedHashCode, out _);
+                }
+            }
+        }
+
+        return messages;
     }
 
     /// <summary>

@@ -9,6 +9,16 @@ namespace FileMqBroker.MqLibrary.RuntimeQueues;
 public interface IMessageFileQueue
 {
     /// <summary>
+    /// Implementation of the duplicate request collapse.
+    /// </summary>
+    DuplicateRequestCollapseType DuplicateRequestCollapseType { get; }
+
+    /// <summary>
+    /// Determines whether an element with the specified key is in the message queue.
+    /// </summary>
+    bool IsMessageInQueue(string key);
+
+    /// <summary>
     /// Enqueues a message into the message queue.
     /// </summary>
     void EnqueueMessage(MessageFile message);
