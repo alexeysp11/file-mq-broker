@@ -9,12 +9,18 @@ public class RabbitMqWriteAdapter : IWriteAdapter
 {
     private IWriteMFQueue m_messageFileQueue;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public RabbitMqWriteAdapter(IWriteMFQueue messageFileQueue)
     {
         m_messageFileQueue = messageFileQueue;
     }
     
-    public async Task WriteMessageAsync(string message)
+    /// <summary>
+    /// 
+    /// </summary>
+    public void WriteMessage(string method, string path, string content)
     {
         // 
     }

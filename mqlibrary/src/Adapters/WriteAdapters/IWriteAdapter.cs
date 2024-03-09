@@ -5,5 +5,8 @@ namespace FileMqBroker.MqLibrary.Adapters.WriteAdapters;
 /// </summary>
 public interface IWriteAdapter
 {
-    Task WriteMessageAsync(string message);
+    /// <summary>
+    /// 
+    /// </summary>
+    void WriteMessage(string method, string path, string content);
 }
