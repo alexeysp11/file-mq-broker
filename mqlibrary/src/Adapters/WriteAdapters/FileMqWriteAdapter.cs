@@ -5,7 +5,7 @@ using FileMqBroker.MqLibrary.RuntimeQueues;
 namespace FileMqBroker.MqLibrary.Adapters.WriteAdapters;
 
 /// <summary>
-/// 
+/// Provides functionality for writing to a file broker message queue.
 /// </summary>
 public class FileMqWriteAdapter : IWriteAdapter
 {
@@ -27,10 +27,19 @@ public class FileMqWriteAdapter : IWriteAdapter
     }
     
     /// <summary>
-    /// 
+    /// Ensures that a message is written to the file broker message queue.
     /// </summary>
     public void WriteMessage(string method, string path, string content)
     {
+        if (m_collapseType == DuplicateRequestCollapseType.Advanced)
+        {
+            var hash = m_fileNameGeneration.CalculateHash(method, path);
+            if (m_messageFileQueue.IsMessageInQueue(hash))
+            {
+                return;
+            }
+        }
+
         var name = m_fileNameGeneration.GetFileName(method, path);
         var messageFile = new MessageFile
         {
