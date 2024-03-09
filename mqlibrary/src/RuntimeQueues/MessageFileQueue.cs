@@ -57,9 +57,9 @@ public class MessageFileQueue : IMessageFileQueue, IReadMFQueue, IWriteMFQueue
     {
         if (m_collapseType == DuplicateRequestCollapseType.Advanced)
         {
-            if (!IsMessageInQueue(message.AdvancedHashCode))
+            if (!IsMessageInQueue(message.CollapseHashCode))
             {
-                m_messageQueueDictionary.TryAdd(message.AdvancedHashCode, message);
+                m_messageQueueDictionary.TryAdd(message.CollapseHashCode, message);
                 m_messageQueue.Enqueue(message);
             }
         }
@@ -80,9 +80,9 @@ public class MessageFileQueue : IMessageFileQueue, IReadMFQueue, IWriteMFQueue
         {
             foreach (var message in messages)
             {
-                if (IsMessageInQueue(message.AdvancedHashCode))
+                if (IsMessageInQueue(message.CollapseHashCode))
                 {
-                    m_messageQueueDictionary.TryRemove(message.AdvancedHashCode, out _);
+                    m_messageQueueDictionary.TryRemove(message.CollapseHashCode, out _);
                 }
             }
         }

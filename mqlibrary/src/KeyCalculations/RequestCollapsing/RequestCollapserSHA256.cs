@@ -21,7 +21,7 @@ public class RequestCollapserSHA256 : IRequestCollapser
     /// <summary>
     /// Calculates the SHA256 hash for collapsing requests, based on the method, path and content.
     /// </summary>
-    public string CollapseRequests(string method, string path, string content)
+    public string CalculateRequestHashCode(string method, string path, string content)
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.Append("<method>").Append(method).Append("</method>");

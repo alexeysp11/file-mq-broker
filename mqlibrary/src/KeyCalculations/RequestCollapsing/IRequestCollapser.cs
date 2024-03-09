@@ -8,5 +8,5 @@ public interface IRequestCollapser
     /// <summary>
     /// Calculates the hash for collapsing requests, based on the method, path and content
     /// </summary>
-    string CollapseRequests(string method, string path, string content);
+    string CalculateRequestHashCode(string method, string path, string content);
 }

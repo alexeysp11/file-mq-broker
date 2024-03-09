@@ -18,7 +18,7 @@ public class MessageFile
     /// <summary>
     /// The advanced hash code of the message file.
     /// </summary>
-    public string? AdvancedHashCode { get; set; }
+    public string? CollapseHashCode { get; set; }
     
     /// <summary>
     /// The type of the message file.

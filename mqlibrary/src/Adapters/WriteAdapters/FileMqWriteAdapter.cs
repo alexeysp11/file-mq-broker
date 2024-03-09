@@ -1,4 +1,5 @@
 using FileMqBroker.MqLibrary.KeyCalculations.FileNameGeneration;
+using FileMqBroker.MqLibrary.KeyCalculations.RequestCollapsing;
 using FileMqBroker.MqLibrary.Models;
 using FileMqBroker.MqLibrary.RuntimeQueues;
 
@@ -10,6 +11,7 @@ namespace FileMqBroker.MqLibrary.Adapters.WriteAdapters;
 public class FileMqWriteAdapter : IWriteAdapter
 {
     private readonly DuplicateRequestCollapseType m_collapseType;
+    private IRequestCollapser m_requestCollapser;
     private IFileNameGeneration m_fileNameGeneration;
     private IWriteMFQueue m_messageFileQueue;
 
@@ -18,10 +20,12 @@ public class FileMqWriteAdapter : IWriteAdapter
     /// </summary>
     public FileMqWriteAdapter(
         AppInitConfigs appInitConfigs,
+        IRequestCollapser requestCollapser,
         IFileNameGeneration fileNameGeneration,
         IWriteMFQueue messageFileQueue)
     {
         m_collapseType = appInitConfigs.DuplicateRequestCollapseType;
+        m_requestCollapser = requestCollapser;
         m_fileNameGeneration = fileNameGeneration;
         m_messageFileQueue = messageFileQueue;
     }
@@ -31,10 +35,11 @@ public class FileMqWriteAdapter : IWriteAdapter
     /// </summary>
     public void WriteMessage(string method, string path, string content)
     {
+        var collapseHash = m_requestCollapser.CalculateRequestHashCode(method, path, content);
+
         if (m_collapseType == DuplicateRequestCollapseType.Advanced)
         {
-            var hash = m_fileNameGeneration.CalculateHash(method, path);
-            if (m_messageFileQueue.IsMessageInQueue(hash))
+            if (m_messageFileQueue.IsMessageInQueue(collapseHash))
             {
                 return;
             }
@@ -45,6 +50,7 @@ public class FileMqWriteAdapter : IWriteAdapter
         {
             Name = name,
             Content = content,
+            CollapseHashCode = collapseHash,
             MessageFileType = MessageFileType.Request,
             MessageFileState = MessageFileState.Undefined
         };
