@@ -30,7 +30,7 @@ public class FileNameGenerationMD5 : IFileNameGeneration
     /// <summary>
     /// Calculates the MD5 hash based on the method and path.
     /// </summary>
-    private string CalculateHash(string method, string path)
+    public string CalculateHash(string method, string path)
     {
         var fullpath = Path.Combine(method, path);
         return m_keyCalculation.CalculateHash(fullpath);

@@ -9,4 +9,9 @@ public interface IFileNameGeneration
     /// Generates a filename.
     /// </summary>
     string GetFileName(string method, string path);
+
+    /// <summary>
+    /// Calculates a hash based on the method and path.
+    /// </summary>
+    string CalculateHash(string method, string path);
 }
