@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.IO;
 using FileMqBroker.MqLibrary.KeyCalculations;
 
@@ -8,6 +9,7 @@ namespace FileMqBroker.MqLibrary.KeyCalculations.FileNameGeneration;
 /// </summary>
 public class FileNameGenerationMD5 : IFileNameGeneration
 {
+    private ConcurrentDictionary<string, string> m_fullpathHashDictionary;
     private IKeyCalculation m_keyCalculation;
 
     /// <summary>
@@ -15,6 +17,7 @@ public class FileNameGenerationMD5 : IFileNameGeneration
     /// </summary>
     public FileNameGenerationMD5(KeyCalculationMD5 keyCalculation)
     {
+        m_fullpathHashDictionary = new ConcurrentDictionary<string, string>();
         m_keyCalculation = keyCalculation;
     }
 
@@ -33,6 +36,14 @@ public class FileNameGenerationMD5 : IFileNameGeneration
     public string CalculateHash(string method, string path)
     {
         var fullpath = Path.Combine(method, path);
-        return m_keyCalculation.CalculateHash(fullpath);
+        
+        if (m_fullpathHashDictionary.ContainsKey(fullpath))
+        {
+            return m_fullpathHashDictionary[fullpath];
+        }
+
+        var hash = m_keyCalculation.CalculateHash(fullpath);
+        m_fullpathHashDictionary.TryAdd(fullpath, hash);
+        return hash;
     }
 }
