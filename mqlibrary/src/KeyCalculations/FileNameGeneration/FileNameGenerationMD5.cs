@@ -4,7 +4,7 @@ using FileMqBroker.MqLibrary.KeyCalculations;
 namespace FileMqBroker.MqLibrary.KeyCalculations.FileNameGeneration;
 
 /// <summary>
-/// Provides MD5 hash calculation functionality.
+/// Generates a filename using MD5 hash calculation functionality.
 /// </summary>
 public class FileNameGenerationMD5 : IFileNameGeneration
 {
@@ -19,9 +19,18 @@ public class FileNameGenerationMD5 : IFileNameGeneration
     }
 
     /// <summary>
+    /// Generates a filename using MD5 hash.
+    /// </summary>
+    public string GetFileName(string method, string path)
+    {
+        var hash = CalculateHash(method, path);
+        return $"{System.DateTime.Now}.{hash}";
+    }
+
+    /// <summary>
     /// Calculates the MD5 hash based on the method and path.
     /// </summary>
-    public string CalculateHash(string method, string path)
+    private string CalculateHash(string method, string path)
     {
         var fullpath = Path.Combine(method, path);
         return m_keyCalculation.CalculateHash(fullpath);

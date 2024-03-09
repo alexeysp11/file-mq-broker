@@ -1,12 +1,12 @@
 namespace FileMqBroker.MqLibrary.KeyCalculations.FileNameGeneration;
 
 /// <summary>
-/// Interface for key calculation.
+/// Interface for a filename generating.
 /// </summary>
 public interface IFileNameGeneration
 {
     /// <summary>
-    /// Calculates the hash based on the method and path.
+    /// Generates a filename.
     /// </summary>
-    string CalculateHash(string method, string path);
+    string GetFileName(string method, string path);
 }
