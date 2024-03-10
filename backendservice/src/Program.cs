@@ -35,8 +35,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IRequestCollapser, RequestCollapserSHA256>();
 
         // Queues.
-        services.AddSingleton<IReadMFQueue, MessageFileQueue>();
-        services.AddSingleton<IWriteMFQueue, MessageFileQueue>();
+        services.AddSingleton<ReadMessageFileQueue>();
+        services.AddSingleton<WriteMessageFileQueue>();
 
         // Queue adapters.
         services.AddSingleton<IReadAdapter, FileMqReadAdapter>();
