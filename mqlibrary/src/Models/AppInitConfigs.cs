@@ -29,4 +29,9 @@ public class AppInitConfigs
     /// Implementation of the duplicate request collapse.
     /// </summary>
     public DuplicateRequestCollapseType DuplicateRequestCollapseType { get; set; }
+    
+    /// <summary>
+    /// Delegate for message processing on the backend service side.
+    /// </summary>
+    public Action<MessageFile> BackendContinuationDelegate { get; set; }
 }

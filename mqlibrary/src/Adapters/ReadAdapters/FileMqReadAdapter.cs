@@ -10,20 +10,19 @@ namespace FileMqBroker.MqLibrary.Adapters.ReadAdapters;
 public class FileMqReadAdapter : IReadAdapter
 {
     private int m_oneTimeProcQueueElements;
-    private IReadMFQueue m_messageFileQueue;
     private Action<MessageFile> m_continuationDelegate;
+    private IReadMFQueue m_messageFileQueue;
 
     /// <summary>
     /// Default constructor.
     /// </summary>
     public FileMqReadAdapter(
         AppInitConfigs appInitConfigs,
-        IReadMFQueue messageFileQueue,
-        Action<MessageFile> continuationDelegate)
+        IReadMFQueue messageFileQueue)
     {
         m_oneTimeProcQueueElements = appInitConfigs.OneTimeProcQueueElements;
+        m_continuationDelegate = appInitConfigs.BackendContinuationDelegate;
         m_messageFileQueue = messageFileQueue;
-        m_continuationDelegate = continuationDelegate;
     }
     
     /// <summary>
