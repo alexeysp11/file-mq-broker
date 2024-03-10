@@ -13,7 +13,7 @@ public class FileMqWriteAdapter : IWriteAdapter
     private readonly DuplicateRequestCollapseType m_collapseType;
     private IRequestCollapser m_requestCollapser;
     private IFileNameGeneration m_fileNameGeneration;
-    private IWriteMFQueue m_messageFileQueue;
+    private IMessageFileQueue m_messageFileQueue;
 
     /// <summary>
     /// Default constructor.
@@ -22,7 +22,7 @@ public class FileMqWriteAdapter : IWriteAdapter
         AppInitConfigs appInitConfigs,
         IRequestCollapser requestCollapser,
         IFileNameGeneration fileNameGeneration,
-        IWriteMFQueue messageFileQueue)
+        WriteMessageFileQueue messageFileQueue)
     {
         m_collapseType = appInitConfigs.DuplicateRequestCollapseType;
         m_requestCollapser = requestCollapser;

@@ -11,7 +11,7 @@ namespace FileMqBroker.MqLibrary.RuntimeQueues;
 /// <summary>
 /// A class that allows you to manage a message queue within an application instance.
 /// </summary>
-public class MessageFileQueue : IMessageFileQueue, IReadMFQueue, IWriteMFQueue
+public class MessageFileQueue : IMessageFileQueue
 {
     private readonly DuplicateRequestCollapseType m_collapseType;
     private ConcurrentDictionary<string, MessageFile> m_messageQueueDictionary;
@@ -122,6 +122,9 @@ public class MessageFileQueue : IMessageFileQueue, IReadMFQueue, IWriteMFQueue
         return DequeueItems(m_exceptionQueue, count);
     }
 
+    /// <summary>
+    /// Method for getting a certain number of elements from a given collection.
+    /// </summary>
     private List<T> DequeueItems<T>(ConcurrentQueue<T> queue, int count)
     {
         var items = new List<T>();

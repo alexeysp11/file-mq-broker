@@ -11,14 +11,14 @@ public class FileMqReadAdapter : IReadAdapter
 {
     private int m_oneTimeProcQueueElements;
     private Action<MessageFile> m_continuationDelegate;
-    private IReadMFQueue m_messageFileQueue;
+    private IMessageFileQueue m_messageFileQueue;
 
     /// <summary>
     /// Default constructor.
     /// </summary>
     public FileMqReadAdapter(
         AppInitConfigs appInitConfigs,
-        IReadMFQueue messageFileQueue)
+        ReadMessageFileQueue messageFileQueue)
     {
         m_oneTimeProcQueueElements = appInitConfigs.OneTimeProcQueueElements;
         m_continuationDelegate = appInitConfigs.BackendContinuationDelegate;

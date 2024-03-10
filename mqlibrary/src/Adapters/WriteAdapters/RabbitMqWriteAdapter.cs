@@ -7,12 +7,12 @@ namespace FileMqBroker.MqLibrary.Adapters.WriteAdapters;
 /// </summary>
 public class RabbitMqWriteAdapter : IWriteAdapter
 {
-    private IWriteMFQueue m_messageFileQueue;
+    private IMessageFileQueue m_messageFileQueue;
 
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public RabbitMqWriteAdapter(IWriteMFQueue messageFileQueue)
+    public RabbitMqWriteAdapter(WriteMessageFileQueue messageFileQueue)
     {
         m_messageFileQueue = messageFileQueue;
     }

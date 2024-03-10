@@ -7,12 +7,12 @@ namespace FileMqBroker.MqLibrary.Adapters.ReadAdapters;
 /// </summary>
 public class RabbitMqReadAdapter<T> : IReadAdapter
 {
-    private IReadMFQueue m_messageFileQueue;
+    private IMessageFileQueue m_messageFileQueue;
 
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public RabbitMqReadAdapter(IReadMFQueue messageFileQueue)
+    public RabbitMqReadAdapter(ReadMessageFileQueue messageFileQueue)
     {
         m_messageFileQueue = messageFileQueue;
     }
