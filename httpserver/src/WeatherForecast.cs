@@ -1,4 +1,4 @@
-namespace src;
+namespace FileMqBroker.HttpService;
 
 public class WeatherForecast
 {

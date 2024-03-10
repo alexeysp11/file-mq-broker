@@ -10,6 +10,8 @@ using FileMqBroker.MqLibrary.KeyCalculations.RequestCollapsing;
 using FileMqBroker.MqLibrary.Models;
 using FileMqBroker.MqLibrary.RuntimeQueues;
 
+namespace FileMqBroker.HttpService;
+
 /// <summary>
 /// Initializes the application.
 /// </summary>

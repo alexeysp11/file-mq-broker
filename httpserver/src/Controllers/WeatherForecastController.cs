@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace src.Controllers;
+namespace FileMqBroker.HttpService.Controllers;
 
 [ApiController]
 [Route("[controller]")]
