@@ -29,4 +29,14 @@ public class MessageFile
     /// The state of the message file.
     /// </summary>
     public MessageFileState MessageFileState { get; set; }
+    
+    /// <summary>
+    /// The name of the HTTP method.
+    /// </summary>
+    public string? HttpMethod { get; set; }
+
+    /// <summary>
+    /// The name of the HTTP path.
+    /// </summary>
+    public string? HttpPath { get; set; }
 }
