@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using FileMqBroker.HttpService.ResponseHandlers;
 using FileMqBroker.MqLibrary.Adapters.ReadAdapters;
 using FileMqBroker.MqLibrary.Adapters.WriteAdapters;
@@ -7,59 +10,73 @@ using FileMqBroker.MqLibrary.KeyCalculations.RequestCollapsing;
 using FileMqBroker.MqLibrary.Models;
 using FileMqBroker.MqLibrary.RuntimeQueues;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// App init configs.
-builder.Services.AddSingleton(_ =>
+/// <summary>
+/// Initializes the application.
+/// </summary>
+public class Program
 {
-    return new AppInitConfigs
+    /// <summary>
+    /// Main method in the application.
+    /// </summary>
+    public static void Main(string[] args)
     {
-        DbConnectionString = "",
-        RequestDirectoryName = "",
-        ResponseDirectoryName = "",
-        OneTimeProcQueueElements = 20_000,
-        DuplicateRequestCollapseType = DuplicateRequestCollapseType.Naive,
-        BackendContinuationDelegate = HttpResponseHandler.ContinuationMethod
-    };
-});
+        var builder = WebApplication.CreateBuilder(args);
+        ConfigureServices(builder.Services);
+        var app = builder.Build();
 
-// Key calculations.
-builder.Services.AddSingleton<KeyCalculationMD5>();
-builder.Services.AddSingleton<KeyCalculationSHA256>();
-builder.Services.AddSingleton<IFileNameGeneration, FileNameGenerationMD5>();
-builder.Services.AddSingleton<IRequestCollapser, RequestCollapserSHA256>();
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
 
-// Queues.
-builder.Services.AddSingleton<IReadMFQueue, MessageFileQueue>();
-builder.Services.AddSingleton<IWriteMFQueue, MessageFileQueue>();
+        // Configure the HTTP request pipeline.
+        app.UseHttpsRedirection();
+        app.UseAuthorization();
+        app.MapControllers();
 
-// Queue adapters.
-builder.Services.AddSingleton<IReadAdapter, FileMqReadAdapter>();
-builder.Services.AddSingleton<IWriteAdapter, FileMqWriteAdapter>();
+        app.Run();
+    }
 
-// Backend worker service.
-builder.Services.AddHostedService<HttpResponseHandler>();
+    /// <summary>
+    /// Provides functionality for configuring services.
+    /// </summary>
+    private static void ConfigureServices(IServiceCollection services)
+    {
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
 
-var app = builder.Build();
+        // App init configs.
+        services.AddSingleton<AppInitConfigs>(_ =>
+        {
+            return new AppInitConfigs
+            {
+                DbConnectionString = "",
+                RequestDirectoryName = "",
+                ResponseDirectoryName = "",
+                OneTimeProcQueueElements = 20_000,
+                DuplicateRequestCollapseType = DuplicateRequestCollapseType.Naive,
+                BackendContinuationDelegate = HttpResponseHandler.ContinuationMethod
+            };
+        });
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+        // Key calculations.
+        services.AddSingleton<KeyCalculationMD5>();
+        services.AddSingleton<KeyCalculationSHA256>();
+        services.AddSingleton<IFileNameGeneration, FileNameGenerationMD5>();
+        services.AddSingleton<IRequestCollapser, RequestCollapserSHA256>();
+
+        // Queues.
+        services.AddSingleton<IReadMFQueue, MessageFileQueue>();
+        services.AddSingleton<IWriteMFQueue, MessageFileQueue>();
+
+        // Queue adapters.
+        services.AddSingleton<IReadAdapter, FileMqReadAdapter>();
+        services.AddSingleton<IWriteAdapter, FileMqWriteAdapter>();
+
+        // Backend worker service.
+        services.AddHostedService<HttpResponseHandler>();
+    }
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
