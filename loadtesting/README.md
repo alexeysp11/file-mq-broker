@@ -112,7 +112,7 @@ delta_t12 > 0
 delta1 > 0
 ```
 
-#### Random promotion
+#### Random increase
 
 Parameters for randomly increasing the load:
 
