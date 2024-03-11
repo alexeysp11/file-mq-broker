@@ -2,31 +2,127 @@
 
 [English](README.md) | [Русский](README.ru.md)
 
-## Types of load testing
-
-It is possible to distinguish several types of load testing:
-- increase
-     - one-time
-     - zero derivative
-     - gradual
-     - jumping
-     - with fluctuations
-- random
-
-### Increase
+## Load testing process
 
 A general diagram illustrating the increase in the number of requests depending on time during load testing is presented in the figure below:
 
 ![loadtesting-increasing-time-diagram](../docs/img/loadtesting-increasing-time-diagram.png)
 
-#### One-time
+### Types of load testing
 
-#### Zero derivative
+It is possible to distinguish several types of load testing:
+- One-time increase
+- Constant load
+- Gradual increase
+- Jumping increase
+- Fluctuation increase
+- Random increase
 
-#### Gradual
+#### One-time increase
 
-#### Jumping
+Diagram of one-time load increase:
 
-#### With fluctuations
+![loadtesting-time-diagram-onetime](../docs/img/loadtesting-time-diagram-onetime.png)
 
-### Random
+Parameters for a one-time load increase:
+
+```
+t1 = 0
+t2 = 1
+delta_min = 0
+delta_max > 0
+delta_r1 = 0
+delta_t11 = 0
+delta_t12 = 0
+delta1 = 0
+```
+
+#### Constant load
+
+Constant load diagram:
+
+![loadtesting-time-diagram-constant](../docs/img/loadtesting-time-diagram-constant.png)
+
+Parameters for constant load:
+
+```
+t1 = 0
+t2 > 0
+delta_min = 0
+delta_max > 0
+delta_r1 = 0
+delta_t11 = 0
+delta_t12 = 0
+delta1 = 0
+```
+
+#### Gradual increase
+
+Gradual load increase diagram:
+
+![loadtesting-time-diagram-gradual](../docs/img/loadtesting-time-diagram-gradual.png)
+
+Parameters for gradually increasing the load:
+
+```
+t1 > 0
+t2 >= 0
+delta_min >= 0
+delta_max > 0
+delta_r1 = 0
+delta_t11 = 0
+delta_t12 = 0
+delta1 = 0
+```
+#### Jumping increase
+
+Jumping load increase diagram:
+
+![loadtesting-increasing-time-diagram](../docs/img/loadtesting-increasing-time-diagram.png)
+
+Parameters for load ramping:
+
+```
+t1 > 0
+t2 >= 0
+delta_min >= 0
+delta_max > 0
+delta_r1 = 0
+delta_t11 >= 0
+delta_t12 > 0
+delta1 > 0
+```
+
+#### Fluctuation increase
+
+Fluctuation load increase diagram:
+
+![loadtesting-increasing-time-diagram](../docs/img/loadtesting-increasing-time-diagram.png)
+
+Parameters for fluctuating load increase:
+
+```
+t1 = 0
+t2 >= 0
+delta_min >= 0
+delta_max > 0
+delta_r1 > 0
+delta_t11 >= 0
+delta_t12 > 0
+delta1 > 0
+```
+
+#### Random promotion
+
+Parameters for randomly increasing the load:
+
+```
+t1 = 0
+t2 > 0
+delta_min = 0
+delta_max > 0
+delta_r1 > 0
+delta_t11 = 0
+delta_t12 = 0
+delta1 = 0
+```
