@@ -1,7 +1,8 @@
 using FileMqBroker.MqLibrary.Adapters.ReadAdapters;
 using FileMqBroker.MqLibrary.Models;
+using FileMqBroker.MqLibrary.ResponseHandlers;
 
-namespace FileMqBroker.HttpService.ResponseHandlers;
+namespace FileMqBroker.HttpService;
 
 /// <summary>
 /// Processes responses from the backend and sends them to the client application via HTTP.
@@ -17,11 +18,12 @@ public class HttpResponseWorker : BackgroundService
     public HttpResponseWorker(
         ILogger<HttpResponseWorker> logger,
         IReadAdapter readAdapter,
+        HttpResponseHandler responseHandler,
         AppInitConfigs appInitConfigs)
     {
         m_logger = logger;
         m_readAdapter = readAdapter;
-        appInitConfigs.BackendContinuationDelegate = ContinuationMethod;
+        appInitConfigs.BackendContinuationDelegate = responseHandler.ContinuationMethod;
     }
 
     /// <summary>
@@ -35,18 +37,5 @@ public class HttpResponseWorker : BackgroundService
             m_readAdapter.ReadMessageQueue();
             await Task.Delay(1000, stoppingToken);
         }
-    }
-    
-    /// <summary>
-    /// Method that is used to process a message received from a message broker.
-    /// </summary>
-    public void ContinuationMethod(MessageFile messageFile)
-    {
-        if (messageFile == null)
-            throw new System.ArgumentNullException(nameof(messageFile));
-
-        System.Console.WriteLine("Message file name: {messageFileName}, {content}", messageFile.Name, messageFile.Content);
-
-        // Send the message via HTTP.
     }
 }

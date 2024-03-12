@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using FileMqBroker.HttpService.ResponseHandlers;
 using FileMqBroker.MqLibrary.Adapters.ReadAdapters;
 using FileMqBroker.MqLibrary.Adapters.WriteAdapters;
 using FileMqBroker.MqLibrary.KeyCalculations;
 using FileMqBroker.MqLibrary.KeyCalculations.FileNameGeneration;
 using FileMqBroker.MqLibrary.KeyCalculations.RequestCollapsing;
 using FileMqBroker.MqLibrary.Models;
+using FileMqBroker.MqLibrary.ResponseHandlers;
 using FileMqBroker.MqLibrary.RuntimeQueues;
 
 namespace FileMqBroker.HttpService;
