@@ -16,10 +16,12 @@ public class HttpResponseHandler : BackgroundService
     /// </summary>
     public HttpResponseHandler(
         ILogger<HttpResponseHandler> logger,
-        IReadAdapter readAdapter)
+        IReadAdapter readAdapter,
+        AppInitConfigs appInitConfigs)
     {
         m_logger = logger;
         m_readAdapter = readAdapter;
+        appInitConfigs.BackendContinuationDelegate = ContinuationMethod;
     }
 
     /// <summary>
@@ -38,7 +40,7 @@ public class HttpResponseHandler : BackgroundService
     /// <summary>
     /// Method that is used to process a message received from a message broker.
     /// </summary>
-    public static void ContinuationMethod(MessageFile messageFile)
+    public void ContinuationMethod(MessageFile messageFile)
     {
         if (messageFile == null)
             throw new System.ArgumentNullException(nameof(messageFile));

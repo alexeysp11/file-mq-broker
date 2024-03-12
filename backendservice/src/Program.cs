@@ -20,8 +20,7 @@ IHost host = Host.CreateDefaultBuilder(args)
                 RequestDirectoryName = "",
                 ResponseDirectoryName = "",
                 OneTimeProcQueueElements = 20_000,
-                DuplicateRequestCollapseType = DuplicateRequestCollapseType.Naive,
-                BackendContinuationDelegate = BackendServiceWorker.ContinuationMethod
+                DuplicateRequestCollapseType = DuplicateRequestCollapseType.Naive
             };
         });
 

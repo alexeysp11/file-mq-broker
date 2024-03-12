@@ -59,8 +59,7 @@ public class Program
                 RequestDirectoryName = "",
                 ResponseDirectoryName = "",
                 OneTimeProcQueueElements = 20_000,
-                DuplicateRequestCollapseType = DuplicateRequestCollapseType.Naive,
-                BackendContinuationDelegate = HttpResponseHandler.ContinuationMethod
+                DuplicateRequestCollapseType = DuplicateRequestCollapseType.Naive
             };
         });
 

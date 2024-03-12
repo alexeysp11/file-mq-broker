@@ -12,8 +12,8 @@ public class BackendServiceWorker : BackgroundService
 {
     private readonly ILogger<BackendServiceWorker> m_logger;
     private IReadAdapter m_readAdapter;
-    private static IWriteAdapter m_writeAdapter;
-    private static MessageFileResponseGen m_messageFileResponseGen;
+    private IWriteAdapter m_writeAdapter;
+    private MessageFileResponseGen m_messageFileResponseGen;
 
     /// <summary>
     /// Default constructor.
@@ -22,12 +22,14 @@ public class BackendServiceWorker : BackgroundService
         ILogger<BackendServiceWorker> logger,
         IReadAdapter readAdapter,
         IWriteAdapter writeAdapter,
-        MessageFileResponseGen messageFileResponseGen)
+        MessageFileResponseGen messageFileResponseGen,
+        AppInitConfigs appInitConfigs)
     {
         m_logger = logger;
         m_readAdapter = readAdapter;
         m_writeAdapter = writeAdapter;
         m_messageFileResponseGen = messageFileResponseGen;
+        appInitConfigs.BackendContinuationDelegate = ContinuationMethod;
     }
 
     /// <summary>
@@ -46,7 +48,7 @@ public class BackendServiceWorker : BackgroundService
     /// <summary>
     /// Method that is used to process a message received from a message broker.
     /// </summary>
-    public static void ContinuationMethod(MessageFile messageFile)
+    public void ContinuationMethod(MessageFile messageFile)
     {
         if (messageFile == null)
             throw new System.ArgumentNullException(nameof(messageFile));

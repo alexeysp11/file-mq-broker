@@ -10,7 +10,7 @@ namespace FileMqBroker.MqLibrary.Adapters.ReadAdapters;
 public class FileMqReadAdapter : IReadAdapter
 {
     private int m_oneTimeProcQueueElements;
-    private Action<MessageFile> m_continuationDelegate;
+    private AppInitConfigs m_appInitConfigs;
     private IMessageFileQueue m_messageFileQueue;
 
     /// <summary>
@@ -21,7 +21,7 @@ public class FileMqReadAdapter : IReadAdapter
         ReadMessageFileQueue messageFileQueue)
     {
         m_oneTimeProcQueueElements = appInitConfigs.OneTimeProcQueueElements;
-        m_continuationDelegate = appInitConfigs.BackendContinuationDelegate;
+        m_appInitConfigs = appInitConfigs;
         m_messageFileQueue = messageFileQueue;
     }
     
@@ -30,12 +30,16 @@ public class FileMqReadAdapter : IReadAdapter
     /// </summary>
     public void ReadMessageQueue()
     {
+        var continuationDelegate = m_appInitConfigs.BackendContinuationDelegate;
+        if (continuationDelegate == null)
+            throw new System.Exception("Continuation delegate could not be null. You have to specify the continuation delegate in order to handle elements from the message queue");
+        
         var messages = m_messageFileQueue.DequeueMessages(m_oneTimeProcQueueElements);
         foreach (var message in messages)
         {
             ThreadPool.QueueUserWorkItem(state =>
             {
-                m_continuationDelegate(message);
+                continuationDelegate(message);
             });
         }
     }
