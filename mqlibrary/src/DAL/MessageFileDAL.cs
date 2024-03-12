@@ -34,7 +34,7 @@ public class MessageFileDAL
     /// </summary>
     public void InsertMessageFileState(IReadOnlyList<MessageFile> fileMessages)
     {
-        var sqlQuery = GenerateInsertSqlByFileNames(fileMessages);
+        var sqlQuery = GenerateInsertSqlByFileMessages(fileMessages);
 
         using (var connection = new SQLiteConnection(m_connectionString))
         {
@@ -74,7 +74,7 @@ public class MessageFileDAL
     /// <summary>
     /// Method for generating an SQL query for inserting data about a file.
     /// </summary>
-    private (string Query, DynamicParameters Parameters) GenerateInsertSqlByFileNames(IReadOnlyList<MessageFile> fileMessages)
+    private (string Query, DynamicParameters Parameters) GenerateInsertSqlByFileMessages(IReadOnlyList<MessageFile> fileMessages)
     {
         if (fileMessages == null)
             throw new System.ArgumentNullException(nameof(fileMessages));
