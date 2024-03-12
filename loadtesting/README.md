@@ -2,6 +2,12 @@
 
 [English](README.md) | [Русский](README.ru.md)
 
+## Architecture
+
+An example module architecture for load testing is presented below:
+
+![loadtesting-architecture](../docs/img/loadtesting-architecture.png)
+
 ## Load testing process
 
 A general diagram illustrating the increase in the number of requests depending on time during load testing is presented in the figure below:
