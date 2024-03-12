@@ -6,16 +6,16 @@ namespace FileMqBroker.HttpService.ResponseHandlers;
 /// <summary>
 /// Processes responses from the backend and sends them to the client application via HTTP.
 /// </summary>
-public class HttpResponseHandler : BackgroundService
+public class HttpResponseWorker : BackgroundService
 {
-    private readonly ILogger<HttpResponseHandler> m_logger;
+    private readonly ILogger<HttpResponseWorker> m_logger;
     private IReadAdapter m_readAdapter;
 
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public HttpResponseHandler(
-        ILogger<HttpResponseHandler> logger,
+    public HttpResponseWorker(
+        ILogger<HttpResponseWorker> logger,
         IReadAdapter readAdapter,
         AppInitConfigs appInitConfigs)
     {

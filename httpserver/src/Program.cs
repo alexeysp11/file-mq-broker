@@ -78,6 +78,6 @@ public class Program
         services.AddSingleton<IWriteAdapter, FileMqWriteAdapter>();
 
         // Backend worker service.
-        services.AddHostedService<HttpResponseHandler>();
+        services.AddHostedService<HttpResponseWorker>();
     }
 }
