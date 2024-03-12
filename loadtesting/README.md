@@ -8,6 +8,8 @@ An example module architecture for load testing is presented below:
 
 ![loadtesting-architecture](../docs/img/loadtesting-architecture.png)
 
+In this example, the orchestrator is not implemented; instead, the required applications are launched manually.
+
 ## Load testing process
 
 A general diagram illustrating the increase in the number of requests depending on time during load testing is presented in the figure below:
@@ -23,6 +25,8 @@ It is possible to distinguish several types of load testing:
 - Jumping increase
 - Fluctuation increase
 - Random increase
+
+In this example, only a one-time increase and a constant load are implemented.
 
 #### One-time increase
 
@@ -76,7 +80,7 @@ t2 >= 0
 delta_min >= 0
 delta_max > 0
 delta_r1 = 0
-delta_t11 = 0
+delta_t11 > 0
 delta_t12 = 0
 delta1 = 0
 ```
@@ -94,7 +98,7 @@ t2 >= 0
 delta_min >= 0
 delta_max > 0
 delta_r1 = 0
-delta_t11 >= 0
+delta_t11 > 0
 delta_t12 > 0
 delta1 > 0
 ```
@@ -113,7 +117,7 @@ t2 >= 0
 delta_min >= 0
 delta_max > 0
 delta_r1 > 0
-delta_t11 >= 0
+delta_t11 > 0
 delta_t12 > 0
 delta1 > 0
 ```
