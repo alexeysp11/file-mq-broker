@@ -5,25 +5,12 @@ namespace FileMqBroker.MqLibrary.LoadTesting.LoadCalculations;
 /// <summary>
 /// 
 /// </summary>
-public class ConstantLoadCalculation : ILoadCalculation
+public class ConstantLoadCalculation : OneTimeLoadCalculation, ILoadCalculation
 {
-    private int m_currentLoad;
-    private LoadConfigParams m_loadConfigParams;
-
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public ConstantLoadCalculation(LoadConfigParams loadConfigParams)
+    public ConstantLoadCalculation(LoadConfigParams loadConfigParams) : base(loadConfigParams)
     {
-        m_currentLoad = 0;
-        m_loadConfigParams = loadConfigParams;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public int CalculateLoad()
-    {
-        return 0;
     }
 }
