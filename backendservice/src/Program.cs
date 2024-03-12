@@ -1,7 +1,8 @@
 using FileMqBroker.MqLibrary.Adapters.ReadAdapters;
 using FileMqBroker.MqLibrary.Adapters.WriteAdapters;
-using FileMqBroker.MqLibrary.BackendService;
-using FileMqBroker.MqLibrary.BackendService.FileContentGenerators;
+using FileMqBroker.BackendService;
+using FileMqBroker.BackendService.FileContentGenerators;
+using FileMqBroker.MqLibrary.FileContentGenerators;
 using FileMqBroker.MqLibrary.KeyCalculations;
 using FileMqBroker.MqLibrary.KeyCalculations.FileNameGeneration;
 using FileMqBroker.MqLibrary.KeyCalculations.RequestCollapsing;
@@ -25,7 +26,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         });
 
         // File content generation.
-        services.AddSingleton<MessageFileResponseGen>();
+        services.AddSingleton<IFileContentGenerator, MessageFileResponseGen>();
 
         // Key calculations.
         services.AddSingleton<KeyCalculationMD5>();
