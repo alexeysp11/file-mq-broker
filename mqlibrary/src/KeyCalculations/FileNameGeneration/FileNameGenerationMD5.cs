@@ -27,7 +27,7 @@ public class FileNameGenerationMD5 : IFileNameGeneration
     public string GetFileName(string method, string path)
     {
         var hash = CalculateHash(method, path);
-        return $"{System.DateTime.Now}.{hash}";
+        return $"{System.DateTime.Now.ToString("yyyyMMddHHmmssfff")}.{hash}.req";
     }
 
     /// <summary>

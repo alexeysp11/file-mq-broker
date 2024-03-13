@@ -29,7 +29,7 @@ public class ReadMqDispatcher : IMqDispatcher
         MessageFileDAL messageFileDAL,
         ExceptionDAL exceptionDAL,
         FileHandler fileHandler, 
-        MessageFileQueue messageFileQueue)
+        ReadMessageFileQueue messageFileQueue)
     {
         m_oneTimeProcQueueElements = appInitConfigs.OneTimeProcQueueElements;
         m_requestDirectoryName = appInitConfigs.RequestDirectoryName;

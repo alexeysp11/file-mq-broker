@@ -27,6 +27,11 @@ public class ExceptionDAL
     /// </summary>
     public void InsertExceptions(IReadOnlyList<string> exceptions)
     {
+        if (exceptions == null)
+            throw new System.ArgumentNullException(nameof(exceptions));
+        if (exceptions.Count == 0)
+            return;
+        
         var sqlQuery = GenerateInsertSqlByExceptions(exceptions);
 
         using (var connection = new SQLiteConnection(m_connectionString))

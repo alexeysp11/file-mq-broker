@@ -17,7 +17,7 @@ public class WriteMqDispatcher : IMqDispatcher
     private readonly string m_responseDirectoryName;
     private readonly int m_oneTimeProcQueueElements;
     private readonly MessageFileDAL m_messageFileDAL;
-    private readonly ExceptionDAL exceptionDAL;
+    private readonly ExceptionDAL m_exceptionDAL;
     private readonly FileHandler m_fileHandler;
     private readonly MessageFileQueue m_messageFileQueue;
 
@@ -29,12 +29,13 @@ public class WriteMqDispatcher : IMqDispatcher
         MessageFileDAL messageFileDAL,
         ExceptionDAL exceptionDAL,
         FileHandler fileHandler, 
-        MessageFileQueue messageFileQueue)
+        WriteMessageFileQueue messageFileQueue)
     {
         m_oneTimeProcQueueElements = appInitConfigs.OneTimeProcQueueElements;
         m_requestDirectoryName = appInitConfigs.RequestDirectoryName;
         m_responseDirectoryName = appInitConfigs.ResponseDirectoryName;
         m_messageFileDAL = messageFileDAL;
+        m_exceptionDAL = exceptionDAL;
         m_fileHandler = fileHandler;
         m_messageFileQueue = messageFileQueue;
     }
@@ -44,8 +45,13 @@ public class WriteMqDispatcher : IMqDispatcher
     /// </summary>
     public void ProcessMessageQueue()
     {
-        // 
         var fileMessages = m_messageFileQueue.DequeueMessages(m_oneTimeProcQueueElements);
+        if (fileMessages == null)
+            throw new System.Exception("Collection of the file messages could not be null");
+        if (fileMessages.Count == 0)
+            return;
+        
+        // Add info about the file into DB.
         ThreadPool.QueueUserWorkItem(state =>
         {
             foreach (var fileMessage in fileMessages)
@@ -54,29 +60,32 @@ public class WriteMqDispatcher : IMqDispatcher
             }
             m_messageFileDAL.InsertMessageFileState(fileMessages);
         });
+        
+        // Create a file.
         var processingTasks = new Task[fileMessages.Count];
         for (int i = 0; i < fileMessages.Count; i++)
         {
+            var fm = fileMessages[i];
             Task task = Task.Run(() =>
             {
-                ProcessFileCreateRequest(fileMessages[i]);
+                ProcessFileCreateRequest(fm);
             });
             processingTasks[i] = task;
         }
         Task.WaitAll(processingTasks);
 
-        // 
+        // Logging messages.
         var logggingMessages = m_messageFileQueue.DequeueMessagesLogging(m_oneTimeProcQueueElements);
         ThreadPool.QueueUserWorkItem(state =>
         {
-            m_messageFileDAL.UpdateMessageFileState(logggingMessages);
+            m_messageFileDAL.InsertMessageFileState(logggingMessages);
         });
 
-        // 
+        // Exceptions.
         var exceptions = m_messageFileQueue.DequeueExceptionLogging(m_oneTimeProcQueueElements);
         ThreadPool.QueueUserWorkItem(state =>
         {
-            exceptionDAL.InsertExceptions(exceptions);
+            m_exceptionDAL.InsertExceptions(exceptions);
         });
     }
 

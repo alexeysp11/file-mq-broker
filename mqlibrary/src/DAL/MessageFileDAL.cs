@@ -15,7 +15,7 @@ public class MessageFileDAL
     #region Private fields
     private readonly string m_connectionString;
     private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.MessageFileState FROM MessageFiles m";
-    private readonly string m_defaultInsertMessageSQL = "INSERT INTO MessageFiles (Name, FileType, FileState) VALUES ";
+    private readonly string m_defaultInsertMessageSQL = "INSERT INTO MessageFiles (Name, MessageFileState) VALUES ";
     #endregion  // Private fields
 
     #region Constructors
@@ -32,8 +32,13 @@ public class MessageFileDAL
     /// <summary>
     /// Method for inserting the specified files in DB.
     /// </summary>
-    public void InsertMessageFileState(IReadOnlyList<MessageFile> fileMessages)
+    public virtual void InsertMessageFileState(IReadOnlyList<MessageFile> fileMessages)
     {
+        if (fileMessages == null)
+            throw new System.ArgumentNullException(nameof(fileMessages));
+        if (fileMessages.Count == 0)
+            return;
+        
         var sqlQuery = GenerateInsertSqlByFileMessages(fileMessages);
 
         using (var connection = new SQLiteConnection(m_connectionString))
@@ -45,8 +50,13 @@ public class MessageFileDAL
     /// <summary>
     /// Method for updating state of the specified files.
     /// </summary>
-    public void UpdateMessageFileState(IReadOnlyList<MessageFile> fileMessages)
+    public virtual void UpdateMessageFileState(IReadOnlyList<MessageFile> fileMessages)
     {
+        if (fileMessages == null)
+            throw new System.ArgumentNullException(nameof(fileMessages));
+        if (fileMessages.Count == 0)
+            return;
+        
         var sqlQuery = GenerateUpdateSqlByFileNames(fileMessages);
 
         using (var connection = new SQLiteConnection(m_connectionString))
@@ -58,8 +68,13 @@ public class MessageFileDAL
     /// <summary>
     /// Method for obtaining information about files.
     /// </summary>
-    public IReadOnlyList<MessageFile> GetMessageFileInfo(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
+    public virtual IReadOnlyList<MessageFile> GetMessageFileInfo(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
     {
+        if (filenames == null)
+            throw new System.ArgumentNullException(nameof(filenames));
+        if (filenames.Count == 0)
+            return new List<MessageFile>();
+        
         var sqlQuery = GenerateSelectSqlByFileNames(filenames, pageSize, pageNumber);
 
         using (var connection = new SQLiteConnection(m_connectionString))
@@ -74,11 +89,8 @@ public class MessageFileDAL
     /// <summary>
     /// Method for generating an SQL query for inserting data about a file.
     /// </summary>
-    private (string Query, DynamicParameters Parameters) GenerateInsertSqlByFileMessages(IReadOnlyList<MessageFile> fileMessages)
+    protected (string Query, DynamicParameters Parameters) GenerateInsertSqlByFileMessages(IReadOnlyList<MessageFile> fileMessages)
     {
-        if (fileMessages == null)
-            throw new System.ArgumentNullException(nameof(fileMessages));
-        
         var queryParameters = new DynamicParameters();
         var stringBuilder = new StringBuilder();
         stringBuilder.Append(m_defaultInsertMessageSQL);
@@ -87,10 +99,9 @@ public class MessageFileDAL
         {
             if (i > 0)
                 stringBuilder.Append(", ");
-            stringBuilder.Append($"(@file_{i}_Name, @file_{i}_FileType, @file_{i}_FileState)");
+            stringBuilder.Append($"(@file_{i}_Name, @file_{i}_FileState)");
 
             queryParameters.Add($"file_{i}_Name", fileMessages[i].Name);
-            queryParameters.Add($"file_{i}_FileType", fileMessages[i].MessageFileType);
             queryParameters.Add($"file_{i}_FileState", fileMessages[i].MessageFileState);
         }
 
@@ -100,11 +111,8 @@ public class MessageFileDAL
     /// <summary>
     /// Method for generating an SQL query for updating data about a file.
     /// </summary>
-    private (string Query, DynamicParameters Parameters) GenerateUpdateSqlByFileNames(IReadOnlyList<MessageFile> fileMessages)
+    protected (string Query, DynamicParameters Parameters) GenerateUpdateSqlByFileNames(IReadOnlyList<MessageFile> fileMessages)
     {
-        if (fileMessages == null)
-            throw new System.ArgumentNullException(nameof(fileMessages));
-        
         var queryParameters = new DynamicParameters();
         var stringBuilder = new StringBuilder();
 
@@ -122,7 +130,7 @@ public class MessageFileDAL
     /// <summary>
     /// Method for generating an SQL query using a file name filter with pagination.
     /// </summary>
-    private (string Query, DynamicParameters Parameters) GenerateSelectSqlByFileNames(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
+    protected (string Query, DynamicParameters Parameters) GenerateSelectSqlByFileNames(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
     {
         if (pageSize <= 0)
             throw new System.ArgumentException("Page size should be greater than zero", nameof(pageSize));
