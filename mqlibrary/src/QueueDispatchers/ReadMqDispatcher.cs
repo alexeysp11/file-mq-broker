@@ -44,7 +44,14 @@ public class ReadMqDispatcher : IMqDispatcher
     /// </summary>
     public void ProcessMessageQueue()
     {
-        var fileMessages = m_messageFileDAL.GetMessageFileInfo(null, 20_000, 1);
+        // 
+        var fileMessages = m_messageFileDAL.GetMessageFileInfo(20_000, 1);
+        if (fileMessages == null)
+            throw new System.Exception("File messages could not be null");
+        if (fileMessages.Count == 0)
+            return;
+        
+        // Enqueue the messages and update their status in DB.
         ThreadPool.QueueUserWorkItem(state =>
         {
             foreach (var fileMessage in fileMessages)
@@ -52,7 +59,10 @@ public class ReadMqDispatcher : IMqDispatcher
                 fileMessage.MessageFileState = MessageFileState.Reading;
                 m_messageFileQueue.EnqueueMessage(fileMessage);
             }
+            m_messageFileDAL.UpdateMessageFileState(fileMessages);
         });
+
+        // Read files from the directory.
         var processingTasks = new Task[fileMessages.Count];
         for (int i = 0; i < fileMessages.Count; i++)
         {
@@ -64,14 +74,14 @@ public class ReadMqDispatcher : IMqDispatcher
         }
         Task.WaitAll(processingTasks);
         
-        // 
-        var logggingMessages = m_messageFileQueue.DequeueMessagesLogging(m_oneTimeProcQueueElements);
+        // Logging messages as processed elements.
+        var loggingMessages = m_messageFileQueue.DequeueMessagesLogging(m_oneTimeProcQueueElements);
         ThreadPool.QueueUserWorkItem(state =>
         {
-            m_messageFileDAL.UpdateMessageFileState(logggingMessages);
+            m_messageFileDAL.UpdateMessageFileState(loggingMessages);
         });
 
-        // 
+        // Add exceptions into database.
         var exceptions = m_messageFileQueue.DequeueExceptionLogging(m_oneTimeProcQueueElements);
         ThreadPool.QueueUserWorkItem(state =>
         {

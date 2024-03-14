@@ -74,11 +74,11 @@ public class WriteMqDispatcher : IMqDispatcher
         }
         Task.WaitAll(processingTasks);
 
-        // Logging messages.
-        var logggingMessages = m_messageFileQueue.DequeueMessagesLogging(m_oneTimeProcQueueElements);
+        // Logging messages as processed elements.
+        var loggingMessages = m_messageFileQueue.DequeueMessagesLogging(m_oneTimeProcQueueElements);
         ThreadPool.QueueUserWorkItem(state =>
         {
-            m_messageFileDAL.InsertMessageFileState(logggingMessages);
+            m_messageFileDAL.InsertMessageFileState(loggingMessages);
         });
 
         // Exceptions.
