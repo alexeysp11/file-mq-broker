@@ -1,13 +1,17 @@
-using FileMqBroker.MqLibrary.Adapters.ReadAdapters;
-using FileMqBroker.MqLibrary.Adapters.WriteAdapters;
 using FileMqBroker.BackendService;
 using FileMqBroker.BackendService.FileContentGenerators;
+using FileMqBroker.MqLibrary.Adapters.ReadAdapters;
+using FileMqBroker.MqLibrary.Adapters.WriteAdapters;
+using FileMqBroker.MqLibrary.DAL;
+using FileMqBroker.MqLibrary.DirectoryOperations;
 using FileMqBroker.MqLibrary.FileContentGenerators;
 using FileMqBroker.MqLibrary.KeyCalculations;
 using FileMqBroker.MqLibrary.KeyCalculations.FileNameGeneration;
 using FileMqBroker.MqLibrary.KeyCalculations.RequestCollapsing;
 using FileMqBroker.MqLibrary.Models;
+using FileMqBroker.MqLibrary.ResponseHandlers;
 using FileMqBroker.MqLibrary.RuntimeQueues;
+using FileMqBroker.MqLibrary.QueueDispatchers;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
@@ -17,9 +21,9 @@ IHost host = Host.CreateDefaultBuilder(args)
         {
             return new AppInitConfigs
             {
-                DbConnectionString = "",
-                RequestDirectoryName = "",
-                ResponseDirectoryName = "",
+                DbConnectionString = "Data Source=test.db;Version=3;",
+                RequestDirectoryName = "RequestDirectoryName",
+                ResponseDirectoryName = "ResponseDirectoryName",
                 OneTimeProcQueueElements = 20_000,
                 DuplicateRequestCollapseType = DuplicateRequestCollapseType.Naive
             };
@@ -42,8 +46,22 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IReadAdapter, FileMqReadAdapter>();
         services.AddSingleton<IWriteAdapter, FileMqWriteAdapter>();
 
+        // DAL objects.
+        services.AddSingleton<MessageFileDAL>();
+        services.AddSingleton<ExceptionDAL>();
+
+        // Directory operations.
+        services.AddSingleton<FileHandler>();
+
+        // Dispatchers.
+        services.AddSingleton<ReadMqDispatcher>();
+
+        // Response handlers.
+        services.AddSingleton<WriteBackResponseHandler>();
+
         // Backend worker service.
         services.AddHostedService<BackendServiceWorker>();
+        services.AddHostedService<ReadMessagesDbWorker>();
     })
     .Build();
 

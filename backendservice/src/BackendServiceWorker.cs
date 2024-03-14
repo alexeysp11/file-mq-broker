@@ -5,7 +5,7 @@ using FileMqBroker.MqLibrary.ResponseHandlers;
 namespace FileMqBroker.BackendService;
 
 /// <summary>
-/// A worker who processes messages on the backend.
+/// A worker that processes messages on the backend.
 /// </summary>
 public class BackendServiceWorker : BackgroundService
 {
@@ -33,7 +33,7 @@ public class BackendServiceWorker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            m_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+            m_logger.LogInformation("BackendServiceWorker running at: {time}", DateTimeOffset.Now);
             m_readAdapter.ReadMessageQueue();
             await Task.Delay(1000, stoppingToken);
         }
