@@ -19,7 +19,7 @@ public class LoadTestingWorker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            // _logger.LogInformation("LoadTestingWorker running at: {time}", DateTimeOffset.Now);
+            _logger.LogInformation("LoadTestingWorker running at: {time}", DateTimeOffset.Now);
             m_loadGenerator.GenerateLoad();
             await Task.Delay(1000, stoppingToken);
         }
