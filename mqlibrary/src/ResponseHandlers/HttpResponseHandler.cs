@@ -3,7 +3,7 @@ using FileMqBroker.MqLibrary.Models;
 namespace FileMqBroker.MqLibrary.ResponseHandlers;
 
 /// <summary>
-/// 
+/// Provides functionality to send messages back over HTTP.
 /// </summary>
 public class HttpResponseHandler : IResponseHandler
 {

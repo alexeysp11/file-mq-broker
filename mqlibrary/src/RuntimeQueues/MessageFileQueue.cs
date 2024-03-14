@@ -91,7 +91,7 @@ public class MessageFileQueue : IMessageFileQueue
     }
 
     /// <summary>
-    /// Enqueues a message into the logging queue.
+    /// Enqueues a message into the logging queue as processed elements.
     /// </summary>
     public void EnqueueMessageLogging(MessageFile message)
     {
@@ -99,7 +99,7 @@ public class MessageFileQueue : IMessageFileQueue
     }
 
     /// <summary>
-    /// Dequeues a specified number of messages from the logging queue.
+    /// Dequeues a specified number of messages from the logging queue as processed elements.
     /// </summary>
     public List<MessageFile> DequeueMessagesLogging(int count)
     {

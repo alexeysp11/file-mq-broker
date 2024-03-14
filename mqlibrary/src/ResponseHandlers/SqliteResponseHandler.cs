@@ -4,7 +4,7 @@ using FileMqBroker.MqLibrary.Models;
 namespace FileMqBroker.MqLibrary.ResponseHandlers;
 
 /// <summary>
-/// 
+/// Provides functionality for recording and logging messages in SQLite.
 /// </summary>
 public class SqliteResponseHandler : IResponseHandler
 {

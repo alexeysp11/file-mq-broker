@@ -5,7 +5,7 @@ using FileMqBroker.MqLibrary.Models;
 namespace FileMqBroker.MqLibrary.ResponseHandlers;
 
 /// <summary>
-/// 
+/// Provides functionality to write messages back to the queue that were processed on the backend.
 /// </summary>
 public class WriteBackResponseHandler : IResponseHandler
 {
@@ -13,7 +13,7 @@ public class WriteBackResponseHandler : IResponseHandler
     private IFileContentGenerator m_fileContentGenerator;
 
     /// <summary>
-    /// 
+    /// Default constructor.
     /// </summary>
     public WriteBackResponseHandler(
         IWriteAdapter writeAdapter,

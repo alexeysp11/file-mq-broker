@@ -29,12 +29,12 @@ public interface IMessageFileQueue
     List<MessageFile> DequeueMessages(int count);
 
     /// <summary>
-    /// Enqueues a message into the logging queue.
+    /// Enqueues a message into the logging queue as processed elements.
     /// </summary>
     void EnqueueMessageLogging(MessageFile message);
 
     /// <summary>
-    /// Dequeues a specified number of messages from the logging queue.
+    /// Dequeues a specified number of messages from the logging queue as processed elements.
     /// </summary>
     List<MessageFile> DequeueMessagesLogging(int count);
 

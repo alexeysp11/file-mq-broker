@@ -3,7 +3,7 @@ using FileMqBroker.MqLibrary.Models;
 namespace FileMqBroker.MqLibrary.ResponseHandlers;
 
 /// <summary>
-/// 
+/// Interface for message handler from queue.
 /// </summary>
 public interface IResponseHandler
 {
