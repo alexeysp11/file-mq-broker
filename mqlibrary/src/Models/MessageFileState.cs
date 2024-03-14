@@ -8,41 +8,41 @@ namespace FileMqBroker.MqLibrary.Models;
 public enum MessageFileState
 {
     [Display(Name = "Undefined")]
-    Undefined,
+    Undefined = 0,
 
     [Display(Name = "Created")]
-    Created,
+    Created = 1,
 
     [Display(Name = "Reading")]
-    Reading,
+    Reading = 2,
 
     [Display(Name = "Writing")]
-    Writing,
+    Writing = 3,
 
     [Display(Name = "Deleting")]
-    Deleting,
+    Deleting = 4,
 
     [Display(Name = "Ready to Write")]
-    ReadyToWrite,
+    ReadyToWrite = 5,
 
     [Display(Name = "Ready to Read")]
-    ReadyToRead,
+    ReadyToRead = 6,
 
     [Display(Name = "Ready to Delete")]
-    ReadyToDelete,
+    ReadyToDelete = 7,
 
     [Display(Name = "Failed to Write")]
-    FailedToWrite,
+    FailedToWrite = 8,
 
     [Display(Name = "Failed to Read")]
-    FailedToRead,
+    FailedToRead = 9,
 
     [Display(Name = "Failed to Delete")]
-    FailedToDelete,
+    FailedToDelete = 10,
     
     [Display(Name = "Processed")]
-    Processed,
+    Processed = 11,
     
     [Display(Name = "Deleted")]
-    Deleted
+    Deleted = 12
 }
