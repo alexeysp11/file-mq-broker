@@ -49,14 +49,20 @@ public class Program
     /// </summary>
     private static void ConfigureServices(IServiceCollection services)
     {
+        // Calculate path.
+        var rootPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", ".."));
+        var dbPath = Path.Combine(rootPath, "data", "db", "test.db");
+        var reqPath = Path.Combine(rootPath, "data", "req");
+        var respPath = Path.Combine(rootPath, "data", "resp");
+
         // App init configs.
         services.AddSingleton<AppInitConfigs>(_ =>
         {
             return new AppInitConfigs
             {
-                DbConnectionString = "Data Source=test.db;Version=3;",
-                RequestDirectoryName = "RequestDirectoryName",
-                ResponseDirectoryName = "ResponseDirectoryName",
+                DbConnectionString = $"Data Source={dbPath};Version=3;",
+                RequestDirectoryName = reqPath,
+                ResponseDirectoryName = respPath,
                 OneTimeProcQueueElements = 20_000,
                 DuplicateRequestCollapseType = DuplicateRequestCollapseType.Naive
             };

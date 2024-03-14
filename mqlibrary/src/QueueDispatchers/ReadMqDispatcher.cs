@@ -94,7 +94,7 @@ public class ReadMqDispatcher : IMqDispatcher
     /// </summary>
     private void ProcessFileReadRequest(MessageFile fileMessage)
     {
-        var fileName = fileMessage.Name;
+        var fileName = Path.Combine(m_requestDirectoryName, fileMessage.Name);
         var fileContent = fileMessage.Content;
         try
         {

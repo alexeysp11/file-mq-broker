@@ -21,7 +21,7 @@ public class WriteMqDispatcherWorker : BackgroundService
         {
             _logger.LogInformation("WriteMqDispatcherWorker running at: {time}", DateTimeOffset.Now);
             m_dispatcher.ProcessMessageQueue();
-            await Task.Delay(5000, stoppingToken);
+            await Task.Delay(1000, stoppingToken);
         }
     }
 }
