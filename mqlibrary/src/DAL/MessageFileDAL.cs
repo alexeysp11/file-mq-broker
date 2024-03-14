@@ -14,7 +14,7 @@ public class MessageFileDAL
 {
     #region Private fields
     private readonly string m_connectionString;
-    private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.MessageFileState FROM MessageFiles m";
+    private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.MessageFileState FROM MessageFiles m ";
     private readonly string m_defaultInsertMessageSQL = "INSERT INTO MessageFiles (Name, MessageFileState) VALUES ";
     #endregion  // Private fields
 
@@ -68,13 +68,22 @@ public class MessageFileDAL
     /// <summary>
     /// Method for obtaining information about files.
     /// </summary>
+    public virtual IReadOnlyList<MessageFile> GetMessageFileInfo(int pageSize, int pageNumber)
+    {
+        var sqlQuery = GenerateSelectSqlReadyToReadFiles(pageSize, pageNumber);
+
+        using (var connection = new SQLiteConnection(m_connectionString))
+        {
+            var result = connection.Query<MessageFile>(sqlQuery).ToList();
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Method for obtaining information about specified files.
+    /// </summary>
     public virtual IReadOnlyList<MessageFile> GetMessageFileInfo(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
     {
-        if (filenames == null)
-            throw new System.ArgumentNullException(nameof(filenames));
-        if (filenames.Count == 0)
-            return new List<MessageFile>();
-        
         var sqlQuery = GenerateSelectSqlByFileNames(filenames, pageSize, pageNumber);
 
         using (var connection = new SQLiteConnection(m_connectionString))
@@ -125,6 +134,24 @@ public class MessageFileDAL
         }
 
         return (stringBuilder.ToString(), queryParameters);
+    }
+
+    /// <summary>
+    /// Generates an SQL query to retrieve readable files.
+    /// </summary>
+    protected string GenerateSelectSqlReadyToReadFiles(int pageSize, int pageNumber)
+    {
+        if (pageSize <= 0)
+            throw new System.ArgumentException("Page size should be greater than zero", nameof(pageSize));
+        if (pageNumber <= 0)
+            throw new System.ArgumentException("Page number should be greater than zero", nameof(pageNumber));
+        
+        var stringBuilder = new StringBuilder();
+        stringBuilder.Append(m_defaultSelectAllSQL);
+        stringBuilder.Append(" WHERE m.MessageFileState = 6");
+        stringBuilder.Append($" LIMIT {pageSize} OFFSET {pageSize * (pageNumber - 1)};");
+
+        return stringBuilder.ToString();
     }
 
     /// <summary>
