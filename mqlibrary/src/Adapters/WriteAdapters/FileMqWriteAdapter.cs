@@ -33,7 +33,7 @@ public class FileMqWriteAdapter : IWriteAdapter
     /// <summary>
     /// Ensures that a message is written to the file broker message queue.
     /// </summary>
-    public void WriteMessage(string method, string path, string content, MessageFileType direction)
+    public void WriteMessage(string method, string path, string content, MessageFileType direction, string? oldMessageFileName = null)
     {
         var collapseHash = m_requestCollapser.CalculateRequestHashCode(method, path, content);
 
@@ -45,7 +45,7 @@ public class FileMqWriteAdapter : IWriteAdapter
             }
         }
 
-        var name = m_fileNameGeneration.GetFileName(method, path, direction);
+        var name = string.IsNullOrEmpty(oldMessageFileName) ? m_fileNameGeneration.GetFileName(method, path, direction) : oldMessageFileName.Replace(".req", ".resp");
         var messageFile = new MessageFile
         {
             Name = name,

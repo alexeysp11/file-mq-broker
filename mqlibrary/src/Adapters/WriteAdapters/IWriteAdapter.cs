@@ -10,5 +10,5 @@ public interface IWriteAdapter
     /// <summary>
     /// Ensures that a message is written to the message queue.
     /// </summary>
-    void WriteMessage(string method, string path, string content, MessageFileType direction);
+    void WriteMessage(string method, string path, string content, MessageFileType direction, string? oldMessageFileName = null);
 }

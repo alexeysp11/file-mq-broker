@@ -21,7 +21,7 @@ public class RabbitMqWriteAdapter : IWriteAdapter
     /// <summary>
     /// Ensures that a message is written to the RabbitMQ message queue.
     /// </summary>
-    public void WriteMessage(string method, string path, string content, MessageFileType direction)
+    public void WriteMessage(string method, string path, string content, MessageFileType direction, string? oldMessageFileName = null)
     {
         // 
     }
