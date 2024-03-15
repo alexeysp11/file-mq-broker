@@ -1,5 +1,5 @@
 CREATE TABLE RequestMessageFiles (
-    MessageFileId INTEGER PRIMARY KEY AUTOINCREMENT,
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL,
     HttpMethod TEXT,
     HttpPath TEXT,
@@ -9,15 +9,15 @@ CREATE TABLE RequestMessageFiles (
 );
 
 CREATE TABLE FileStateHistory (
-    FileStateHistoryId INTEGER PRIMARY KEY AUTOINCREMENT,
-    MessageFileId INTEGER NOT NULL,
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    RequestMessageFileId INTEGER NOT NULL,
     NewState TEXT NOT NULL,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (MessageFileId) REFERENCES RequestMessageFiles(MessageFileId)
+    FOREIGN KEY (RequestMessageFileId) REFERENCES RequestMessageFiles(Id)
 );
 
 CREATE TABLE ResponseMessageFiles (
-    ResponseId INTEGER PRIMARY KEY AUTOINCREMENT,
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL,
     HttpMethod TEXT,
     HttpPath TEXT,
