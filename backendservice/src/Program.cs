@@ -31,6 +31,7 @@ IHost host = Host.CreateDefaultBuilder(args)
                 RequestDirectoryName = reqPath,
                 ResponseDirectoryName = respPath,
                 OneTimeProcQueueElements = 20_000,
+                ReadMqDispatcherMessageFileType = MessageFileType.Request,
                 DuplicateRequestCollapseType = DuplicateRequestCollapseType.Naive
             };
         });

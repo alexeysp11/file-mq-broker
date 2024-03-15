@@ -64,6 +64,7 @@ public class Program
                 RequestDirectoryName = reqPath,
                 ResponseDirectoryName = respPath,
                 OneTimeProcQueueElements = 20_000,
+                ReadMqDispatcherMessageFileType = MessageFileType.Response,
                 DuplicateRequestCollapseType = DuplicateRequestCollapseType.Naive
             };
         });

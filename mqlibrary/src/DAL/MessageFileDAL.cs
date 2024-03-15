@@ -14,8 +14,10 @@ public class MessageFileDAL
 {
     #region Private fields
     private readonly string m_connectionString;
-    private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.HttpMethod, m.HttpPath, m.MessageFileState FROM MessageFiles m ";
-    private readonly string m_defaultInsertMessageSQL = "INSERT INTO MessageFiles (Name, HttpMethod, HttpPath, MessageFileState) VALUES ";
+    private readonly string m_requestMessageFiles = "RequestMessageFiles";
+    private readonly string m_responseMessageFiles = "ResponseMessageFiles";
+    private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.HttpMethod, m.HttpPath, m.MessageFileState FROM {0} m ";
+    private readonly string m_defaultInsertMessageSQL = "INSERT INTO {0} (Name, HttpMethod, HttpPath, MessageFileState) VALUES ";
     #endregion  // Private fields
 
     #region Constructors
@@ -68,27 +70,13 @@ public class MessageFileDAL
     /// <summary>
     /// Method for obtaining information about files.
     /// </summary>
-    public virtual IReadOnlyList<MessageFile> GetMessageFileInfo(int pageSize, int pageNumber)
+    public virtual IReadOnlyList<MessageFile> GetMessageFileInfo(int pageSize, int pageNumber, MessageFileType messageFileType)
     {
-        var sqlQuery = GenerateSelectSqlReadyToReadFiles(pageSize, pageNumber);
+        var sqlQuery = GenerateSelectSqlReadyToReadFiles(pageSize, pageNumber, messageFileType);
 
         using (var connection = new SQLiteConnection(m_connectionString))
         {
             var result = connection.Query<MessageFile>(sqlQuery).ToList();
-            return result;
-        }
-    }
-
-    /// <summary>
-    /// Method for obtaining information about specified files.
-    /// </summary>
-    public virtual IReadOnlyList<MessageFile> GetMessageFileInfo(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
-    {
-        var sqlQuery = GenerateSelectSqlByFileNames(filenames, pageSize, pageNumber);
-
-        using (var connection = new SQLiteConnection(m_connectionString))
-        {
-            var result = connection.Query<MessageFile>(sqlQuery.Query, sqlQuery.Parameters).ToList();
             return result;
         }
     }
@@ -102,13 +90,12 @@ public class MessageFileDAL
     {
         var queryParameters = new DynamicParameters();
         var stringBuilder = new StringBuilder();
-        stringBuilder.Append(m_defaultInsertMessageSQL);
 
         for (int i = 0; i < fileMessages.Count; i++)
         {
-            if (i > 0)
-                stringBuilder.Append(", ");
-            stringBuilder.Append($"(@file_{i}_Name, @file_{i}_HttpMethod, @file_{i}_HttpPath, @file_{i}_FileState)");
+            var messageFileType = fileMessages[i].MessageFileType;
+            stringBuilder.Append(string.Format(m_defaultInsertMessageSQL, (messageFileType == MessageFileType.Request ? m_requestMessageFiles : m_responseMessageFiles)));
+            stringBuilder.Append($"(@file_{i}_Name, @file_{i}_HttpMethod, @file_{i}_HttpPath, @file_{i}_FileState);");
 
             queryParameters.Add($"file_{i}_Name", fileMessages[i].Name);
             queryParameters.Add($"file_{i}_HttpMethod", fileMessages[i].HttpMethod);
@@ -129,7 +116,8 @@ public class MessageFileDAL
 
         for (int i = 0; i < fileMessages.Count; i++)
         {
-            stringBuilder.Append($"UPDATE MessageFiles SET MessageFileState = @MessageFileState_{i} WHERE Name = @Name_{i};");
+            var table = fileMessages[i].MessageFileType == MessageFileType.Request ? m_requestMessageFiles : m_responseMessageFiles;
+            stringBuilder.Append($"UPDATE {table} SET MessageFileState = @MessageFileState_{i} WHERE Name = @Name_{i};");
             
             queryParameters.Add($"MessageFileState_{i}", fileMessages[i].MessageFileState);
             queryParameters.Add($"Name_{i}", fileMessages[i].Name);
@@ -141,7 +129,7 @@ public class MessageFileDAL
     /// <summary>
     /// Generates an SQL query to retrieve readable files.
     /// </summary>
-    protected string GenerateSelectSqlReadyToReadFiles(int pageSize, int pageNumber)
+    protected string GenerateSelectSqlReadyToReadFiles(int pageSize, int pageNumber, MessageFileType messageFileType)
     {
         if (pageSize <= 0)
             throw new System.ArgumentException("Page size should be greater than zero", nameof(pageSize));
@@ -149,51 +137,11 @@ public class MessageFileDAL
             throw new System.ArgumentException("Page number should be greater than zero", nameof(pageNumber));
         
         var stringBuilder = new StringBuilder();
-        stringBuilder.Append(m_defaultSelectAllSQL);
+        stringBuilder.Append(string.Format(m_defaultSelectAllSQL, (messageFileType == MessageFileType.Request ? m_requestMessageFiles : m_responseMessageFiles)));
         stringBuilder.Append(" WHERE m.MessageFileState = 6");
         stringBuilder.Append($" LIMIT {pageSize} OFFSET {pageSize * (pageNumber - 1)};");
 
         return stringBuilder.ToString();
-    }
-
-    /// <summary>
-    /// Method for generating an SQL query using a file name filter with pagination.
-    /// </summary>
-    protected (string Query, DynamicParameters Parameters) GenerateSelectSqlByFileNames(IReadOnlyList<string> filenames, int pageSize, int pageNumber)
-    {
-        if (pageSize <= 0)
-            throw new System.ArgumentException("Page size should be greater than zero", nameof(pageSize));
-        if (pageNumber <= 0)
-            throw new System.ArgumentException("Page number should be greater than zero", nameof(pageNumber));
-        
-        var stringBuilder = new StringBuilder();
-        stringBuilder.Append(m_defaultSelectAllSQL);
-
-        var parameters = new DynamicParameters();
-        if (filenames != null && filenames.Count > 0)
-        {
-            // Calculate the start and end indexes for the current page.
-            int startIndex = (pageNumber - 1) * pageSize;
-            int endIndex = Math.Min(startIndex + pageSize, filenames.Count);
-            if (startIndex >= endIndex)
-                throw new System.IndexOutOfRangeException("Failed pagination: start index could not be bigger than end index");
-
-            // Generate the WHERE condition and dynamic parameters in a loop using the calculated indexes.
-            // The loop is used to optimize the WHERE clause and reduce memory allocation while filtering.
-            stringBuilder.Append(" WHERE m.Name IN (");
-            for (int i = startIndex; i < endIndex; i++)
-            {
-                stringBuilder.Append($"@FileName{i}");
-                if (i < endIndex - 1)
-                    stringBuilder.Append(", ");
-                
-                parameters.Add($"FileName{i}", filenames[i]);
-            }
-            stringBuilder.Append(")");
-        }
-        
-        stringBuilder.Append(";");
-        return (stringBuilder.ToString(), parameters);
     }
     #endregion  // Private methods
 }

@@ -1,4 +1,4 @@
-CREATE TABLE MessageFiles (
+CREATE TABLE RequestMessageFiles (
     MessageFileId INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL,
     HttpMethod TEXT,
@@ -13,7 +13,17 @@ CREATE TABLE FileStateHistory (
     MessageFileId INTEGER NOT NULL,
     NewState TEXT NOT NULL,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (MessageFileId) REFERENCES MessageFiles(MessageFileId)
+    FOREIGN KEY (MessageFileId) REFERENCES RequestMessageFiles(MessageFileId)
+);
+
+CREATE TABLE ResponseMessageFiles (
+    ResponseId INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL,
+    HttpMethod TEXT,
+    HttpPath TEXT,
+    Size INTEGER,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    MessageFileState TEXT NOT NULL
 );
 
 CREATE TABLE ExceptionLog (
@@ -21,11 +31,4 @@ CREATE TABLE ExceptionLog (
     ExceptionMessage TEXT NOT NULL,
     StackTrace TEXT,
     Timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE Responses (
-    ResponseId INTEGER PRIMARY KEY AUTOINCREMENT,
-    Name TEXT NOT NULL,
-    Content TEXT NOT NULL,
-    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );

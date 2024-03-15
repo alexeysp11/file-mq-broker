@@ -16,6 +16,7 @@ public class ReadMqDispatcher : IMqDispatcher
     private readonly string m_requestDirectoryName;
     private readonly string m_responseDirectoryName;
     private readonly int m_oneTimeProcQueueElements;
+    private readonly MessageFileType m_messageFileType;
     private readonly MessageFileDAL m_messageFileDAL;
     private readonly ExceptionDAL m_exceptionDAL;
     private readonly FileHandler m_fileHandler;
@@ -34,6 +35,7 @@ public class ReadMqDispatcher : IMqDispatcher
         m_oneTimeProcQueueElements = appInitConfigs.OneTimeProcQueueElements;
         m_requestDirectoryName = appInitConfigs.RequestDirectoryName;
         m_responseDirectoryName = appInitConfigs.ResponseDirectoryName;
+        m_messageFileType = appInitConfigs.ReadMqDispatcherMessageFileType;
         m_messageFileDAL = messageFileDAL;
         m_exceptionDAL = exceptionDAL;
         m_fileHandler = fileHandler;
@@ -46,7 +48,7 @@ public class ReadMqDispatcher : IMqDispatcher
     public void ProcessMessageQueue()
     {
         // 
-        var fileMessages = m_messageFileDAL.GetMessageFileInfo(20_000, 1);
+        var fileMessages = m_messageFileDAL.GetMessageFileInfo(20_000, 1, m_messageFileType);
         if (fileMessages == null)
             throw new System.Exception("File messages could not be null");
         if (fileMessages.Count == 0)
@@ -96,7 +98,7 @@ public class ReadMqDispatcher : IMqDispatcher
     /// </summary>
     private void ProcessFileReadRequest(MessageFile fileMessage)
     {
-        var fileName = Path.Combine(m_requestDirectoryName, fileMessage.Name);
+        var fileName = Path.Combine((m_messageFileType == MessageFileType.Request ? m_requestDirectoryName : m_responseDirectoryName), fileMessage.Name);
         var fileContent = fileMessage.Content;
         try
         {

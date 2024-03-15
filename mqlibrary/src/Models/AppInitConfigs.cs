@@ -31,6 +31,11 @@ public class AppInitConfigs
     public DuplicateRequestCollapseType DuplicateRequestCollapseType { get; set; }
     
     /// <summary>
+    /// Read dispatcher message file type that determines the name of a table in the SELECT SQL requests.
+    /// </summary>
+    public MessageFileType ReadMqDispatcherMessageFileType { get; set; }
+    
+    /// <summary>
     /// Delegate for message processing on the backend service side.
     /// </summary>
     public Action<MessageFile> BackendContinuationDelegate { get; set; }
