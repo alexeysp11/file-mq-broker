@@ -78,7 +78,7 @@ public class WriteMqDispatcher : IMqDispatcher
         var loggingMessages = m_messageFileQueue.DequeueMessagesLogging(m_oneTimeProcQueueElements);
         ThreadPool.QueueUserWorkItem(state =>
         {
-            m_messageFileDAL.InsertMessageFileState(loggingMessages);
+            m_messageFileDAL.UpdateMessageFileState(loggingMessages);
         });
 
         // Exceptions.
@@ -96,6 +96,7 @@ public class WriteMqDispatcher : IMqDispatcher
     {
         var fileName = Path.Combine(m_requestDirectoryName, fileMessage.Name);
         var fileContent = fileMessage.Content;
+        System.Console.WriteLine($"fileName: {fileName}. fileContent: {fileContent}");
         try
         {
             m_fileHandler.CreateFile(fileName);

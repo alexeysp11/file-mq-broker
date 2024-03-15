@@ -1,6 +1,7 @@
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using FileMqBroker.MqLibrary.Adapters.WriteAdapters;
+using FileMqBroker.MqLibrary.Models;
 
 namespace FileMqBroker.HttpService.Controllers;
 
@@ -24,7 +25,7 @@ public class InvestmentController : ControllerBase
     {
         ThreadPool.QueueUserWorkItem(state =>
         {
-            m_writeAdapter.WriteMessage("HttpGet", "GetInvestmentStats", string.Empty);
+            m_writeAdapter.WriteMessage("HttpGet", "GetInvestmentStats", string.Empty, MessageFileType.Request);
         });
         return 200;
     }
@@ -34,7 +35,7 @@ public class InvestmentController : ControllerBase
     {
         ThreadPool.QueueUserWorkItem(state =>
         {
-            m_writeAdapter.WriteMessage("HttpPost", "RequestInvestment", content);
+            m_writeAdapter.WriteMessage("HttpPost", "RequestInvestment", content, MessageFileType.Request);
         });
         return 200;
     }

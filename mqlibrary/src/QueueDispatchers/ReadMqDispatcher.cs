@@ -17,7 +17,7 @@ public class ReadMqDispatcher : IMqDispatcher
     private readonly string m_responseDirectoryName;
     private readonly int m_oneTimeProcQueueElements;
     private readonly MessageFileDAL m_messageFileDAL;
-    private readonly ExceptionDAL exceptionDAL;
+    private readonly ExceptionDAL m_exceptionDAL;
     private readonly FileHandler m_fileHandler;
     private readonly MessageFileQueue m_messageFileQueue;
 
@@ -35,6 +35,7 @@ public class ReadMqDispatcher : IMqDispatcher
         m_requestDirectoryName = appInitConfigs.RequestDirectoryName;
         m_responseDirectoryName = appInitConfigs.ResponseDirectoryName;
         m_messageFileDAL = messageFileDAL;
+        m_exceptionDAL = exceptionDAL;
         m_fileHandler = fileHandler;
         m_messageFileQueue = messageFileQueue;
     }
@@ -66,9 +67,10 @@ public class ReadMqDispatcher : IMqDispatcher
         var processingTasks = new Task[fileMessages.Count];
         for (int i = 0; i < fileMessages.Count; i++)
         {
+            var fm = fileMessages[i];
             Task task = Task.Run(() =>
             {
-                ProcessFileReadRequest(fileMessages[i]);
+                ProcessFileReadRequest(fm);
             });
             processingTasks[i] = task;
         }
@@ -85,7 +87,7 @@ public class ReadMqDispatcher : IMqDispatcher
         var exceptions = m_messageFileQueue.DequeueExceptionLogging(m_oneTimeProcQueueElements);
         ThreadPool.QueueUserWorkItem(state =>
         {
-            exceptionDAL.InsertExceptions(exceptions);
+            m_exceptionDAL.InsertExceptions(exceptions);
         });
     }
 

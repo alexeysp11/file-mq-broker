@@ -61,6 +61,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         // Dispatchers.
         services.AddSingleton<ReadMqDispatcher>();
+        services.AddSingleton<WriteMqDispatcher>();
 
         // Response handlers.
         services.AddSingleton<WriteBackResponseHandler>();
@@ -68,6 +69,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         // Backend worker service.
         services.AddHostedService<BackendServiceWorker>();
         services.AddHostedService<ReadMessagesDbWorker>();
+        services.AddHostedService<WriteMessagesDbWorker>();
     })
     .Build();
 

@@ -31,9 +31,7 @@ public class WriteBackResponseHandler : IResponseHandler
         if (messageFile == null)
             throw new System.ArgumentNullException(nameof(messageFile));
 
-        System.Console.WriteLine("Message file name: {messageFileName}, {content}", messageFile.Name, messageFile.Content);
-
         var responseContent = m_fileContentGenerator.GenerateContent(messageFile.Name);
-        m_writeAdapter.WriteMessage(messageFile.HttpMethod, messageFile.HttpPath, responseContent);
+        m_writeAdapter.WriteMessage(messageFile.HttpMethod, messageFile.HttpPath, responseContent, MessageFileType.Response);
     }
 }

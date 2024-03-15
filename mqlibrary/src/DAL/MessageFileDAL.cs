@@ -14,8 +14,8 @@ public class MessageFileDAL
 {
     #region Private fields
     private readonly string m_connectionString;
-    private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.MessageFileState FROM MessageFiles m ";
-    private readonly string m_defaultInsertMessageSQL = "INSERT INTO MessageFiles (Name, MessageFileState) VALUES ";
+    private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.HttpMethod, m.HttpPath, m.MessageFileState FROM MessageFiles m ";
+    private readonly string m_defaultInsertMessageSQL = "INSERT INTO MessageFiles (Name, HttpMethod, HttpPath, MessageFileState) VALUES ";
     #endregion  // Private fields
 
     #region Constructors
@@ -108,9 +108,11 @@ public class MessageFileDAL
         {
             if (i > 0)
                 stringBuilder.Append(", ");
-            stringBuilder.Append($"(@file_{i}_Name, @file_{i}_FileState)");
+            stringBuilder.Append($"(@file_{i}_Name, @file_{i}_HttpMethod, @file_{i}_HttpPath, @file_{i}_FileState)");
 
             queryParameters.Add($"file_{i}_Name", fileMessages[i].Name);
+            queryParameters.Add($"file_{i}_HttpMethod", fileMessages[i].HttpMethod);
+            queryParameters.Add($"file_{i}_HttpPath", fileMessages[i].HttpPath);
             queryParameters.Add($"file_{i}_FileState", fileMessages[i].MessageFileState);
         }
 

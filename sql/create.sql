@@ -1,6 +1,8 @@
 CREATE TABLE MessageFiles (
     MessageFileId INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL,
+    HttpMethod TEXT,
+    HttpPath TEXT,
     Size INTEGER,
     CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     MessageFileState TEXT NOT NULL

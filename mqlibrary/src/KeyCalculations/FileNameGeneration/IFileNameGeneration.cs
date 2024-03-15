@@ -1,3 +1,5 @@
+using FileMqBroker.MqLibrary.Models;
+
 namespace FileMqBroker.MqLibrary.KeyCalculations.FileNameGeneration;
 
 /// <summary>
@@ -8,7 +10,7 @@ public interface IFileNameGeneration
     /// <summary>
     /// Generates a filename.
     /// </summary>
-    string GetFileName(string method, string path);
+    string GetFileName(string method, string path, MessageFileType direction);
 
     /// <summary>
     /// Calculates a hash based on the method and path.

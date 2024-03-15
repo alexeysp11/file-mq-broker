@@ -1,3 +1,5 @@
+using FileMqBroker.MqLibrary.Models;
+
 namespace FileMqBroker.MqLibrary.Adapters.WriteAdapters;
 
 /// <summary>
@@ -8,5 +10,5 @@ public interface IWriteAdapter
     /// <summary>
     /// Ensures that a message is written to the message queue.
     /// </summary>
-    void WriteMessage(string method, string path, string content);
+    void WriteMessage(string method, string path, string content, MessageFileType direction);
 }
