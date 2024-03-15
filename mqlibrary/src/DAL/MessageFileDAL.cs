@@ -18,6 +18,7 @@ public class MessageFileDAL
     private readonly string m_responseMessageFiles = "ResponseMessageFiles";
     private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.HttpMethod, m.HttpPath, m.MessageFileState FROM {0} m ";
     private readonly string m_defaultInsertMessageSQL = "INSERT INTO {0} (Name, HttpMethod, HttpPath, MessageFileState) VALUES ";
+    private readonly string m_defaultUpdateOldMessageSQL = "update RequestMessageFiles set MessageFileState = 6 where MessageFileState not in (6, 8, 9, 10, 11, 12) and CreatedAt < datetime('now', '-5 seconds');";
     #endregion  // Private fields
 
     #region Constructors
@@ -50,6 +51,19 @@ public class MessageFileDAL
     }
 
     /// <summary>
+    /// Method for updating state of old files.
+    /// </summary>
+    public virtual void UpdateOldMessageFileState()
+    {
+        var sqlQuery = m_defaultUpdateOldMessageSQL;
+
+        using (var connection = new SQLiteConnection(m_connectionString))
+        {
+            connection.Execute(sqlQuery);
+        }
+    }
+
+    /// <summary>
     /// Method for updating state of the specified files.
     /// </summary>
     public virtual void UpdateMessageFileState(IReadOnlyList<MessageFile> fileMessages)
@@ -74,11 +88,12 @@ public class MessageFileDAL
     {
         var sqlQuery = GenerateSelectSqlReadyToReadFiles(pageSize, pageNumber, messageFileType);
 
+        IReadOnlyList<MessageFile> result;
         using (var connection = new SQLiteConnection(m_connectionString))
         {
-            var result = connection.Query<MessageFile>(sqlQuery).ToList();
-            return result;
+            result = connection.Query<MessageFile>(sqlQuery).ToList();
         }
+        return result;
     }
     #endregion  // Public methods
 

@@ -96,7 +96,6 @@ public class WriteMqDispatcher : IMqDispatcher
     {
         var fileName = Path.Combine((fileMessage.MessageFileType == MessageFileType.Request ? m_requestDirectoryName : m_responseDirectoryName), fileMessage.Name);
         var fileContent = fileMessage.Content;
-        System.Console.WriteLine($"fileName: {fileName}. fileContent: {fileContent}");
         try
         {
             m_fileHandler.CreateFile(fileName);

@@ -48,6 +48,7 @@ public class ReadMqDispatcher : IMqDispatcher
     public void ProcessMessageQueue()
     {
         // 
+        m_messageFileDAL.UpdateOldMessageFileState();
         var fileMessages = m_messageFileDAL.GetMessageFileInfo(20_000, 1, m_messageFileType);
         if (fileMessages == null)
             throw new System.Exception("File messages could not be null");
