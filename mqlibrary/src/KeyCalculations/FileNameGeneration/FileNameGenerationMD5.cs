@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 using FileMqBroker.MqLibrary.KeyCalculations;
@@ -10,20 +11,20 @@ namespace FileMqBroker.MqLibrary.KeyCalculations.FileNameGeneration;
 /// </summary>
 public class FileNameGenerationMD5 : IFileNameGeneration
 {
+    private Random m_random;
     private ConcurrentDictionary<string, string> m_fullpathHashDictionary;
     private IKeyCalculation m_keyCalculation;
-    private string m_reqExtension;
-    private string m_respExtension;
+    private readonly string m_reqExtension = "req";
+    private readonly string m_respExtension = "resp";
 
     /// <summary>
     /// Default constructor.
     /// </summary>
     public FileNameGenerationMD5(KeyCalculationMD5 keyCalculation)
     {
+        m_random = new Random();
         m_fullpathHashDictionary = new ConcurrentDictionary<string, string>();
         m_keyCalculation = keyCalculation;
-        m_reqExtension = "req";
-        m_respExtension = "resp";
     }
 
     /// <summary>
@@ -32,7 +33,8 @@ public class FileNameGenerationMD5 : IFileNameGeneration
     public string GetFileName(string method, string path, MessageFileType direction)
     {
         var hash = CalculateHash(method, path);
-        return $"{System.DateTime.Now.ToString("yyyyMMddHHmmssfff")}.{hash}.{GetMessageFileExtension(direction)}";
+        var randomPostfix = m_random.Next().ToString("D10");
+        return $"{System.DateTime.Now.ToString("yyyyMMddHHmmssfff")}.{hash}.{randomPostfix}.{GetMessageFileExtension(direction)}";
     }
 
     /// <summary>
