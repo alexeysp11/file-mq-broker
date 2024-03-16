@@ -72,7 +72,7 @@ public class Program
         {
             return new LoadConfigParams
             {
-                DeltaMax = 1
+                DeltaMax = 100
             };
         });
 
@@ -91,8 +91,8 @@ public class Program
         services.AddSingleton<IWriteAdapter, FileMqWriteAdapter>();
 
         // DAL objects.
-        services.AddSingleton<MessageFileDAL>();
-        services.AddSingleton<ExceptionDAL>();
+        services.AddSingleton<IMessageFileDAL, SqliteMessageFileDAL>();
+        services.AddSingleton<IExceptionDAL, SqliteExceptionDAL>();
 
         // Directory operations.
         services.AddSingleton<FileHandler>();

@@ -9,7 +9,7 @@ namespace FileMqBroker.MqLibrary.DAL;
 /// <summary>
 /// Allows you to add information about exceptions to the database.
 /// </summary>
-public class ExceptionDAL
+public class SqliteExceptionDAL : IExceptionDAL
 {
     private readonly string m_connectionString;
     private readonly string m_defaultInsertSQL = "INSERT INTO ExceptionLog (ExceptionMessage) VALUES ";
@@ -17,7 +17,7 @@ public class ExceptionDAL
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public ExceptionDAL(AppInitConfigs appInitConfigs)
+    public SqliteExceptionDAL(AppInitConfigs appInitConfigs)
     {
         m_connectionString = appInitConfigs.DbConnectionString;
     }

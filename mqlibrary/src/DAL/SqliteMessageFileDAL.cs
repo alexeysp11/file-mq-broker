@@ -10,7 +10,7 @@ namespace FileMqBroker.MqLibrary.DAL;
 /// Defines the functionality required for communication with the database at the Data Access Layer (DAL) level 
 /// as part of working with a message.
 /// </summary>
-public class MessageFileDAL
+public class SqliteMessageFileDAL : IMessageFileDAL
 {
     #region Private fields
     private readonly string m_connectionString;
@@ -25,7 +25,7 @@ public class MessageFileDAL
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public MessageFileDAL(AppInitConfigs appInitConfigs)
+    public SqliteMessageFileDAL(AppInitConfigs appInitConfigs)
     {
         m_connectionString = appInitConfigs.DbConnectionString;
     }

@@ -54,8 +54,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IWriteAdapter, FileMqWriteAdapter>();
 
         // DAL objects.
-        services.AddSingleton<MessageFileDAL>();
-        services.AddSingleton<ExceptionDAL>();
+        services.AddSingleton<IMessageFileDAL, SqliteMessageFileDAL>();
+        services.AddSingleton<IExceptionDAL, SqliteExceptionDAL>();
 
         // Directory operations.
         services.AddSingleton<FileHandler>();

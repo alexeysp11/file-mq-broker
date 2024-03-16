@@ -17,8 +17,8 @@ public class ReadMqDispatcher : IMqDispatcher
     private readonly string m_responseDirectoryName;
     private readonly int m_oneTimeProcQueueElements;
     private readonly MessageFileType m_messageFileType;
-    private readonly MessageFileDAL m_messageFileDAL;
-    private readonly ExceptionDAL m_exceptionDAL;
+    private readonly IMessageFileDAL m_messageFileDAL;
+    private readonly IExceptionDAL m_exceptionDAL;
     private readonly FileHandler m_fileHandler;
     private readonly MessageFileQueue m_messageFileQueue;
 
@@ -27,8 +27,8 @@ public class ReadMqDispatcher : IMqDispatcher
     /// </summary>
     public ReadMqDispatcher(
         AppInitConfigs appInitConfigs, 
-        MessageFileDAL messageFileDAL,
-        ExceptionDAL exceptionDAL,
+        IMessageFileDAL messageFileDAL,
+        IExceptionDAL exceptionDAL,
         FileHandler fileHandler, 
         ReadMessageFileQueue messageFileQueue)
     {

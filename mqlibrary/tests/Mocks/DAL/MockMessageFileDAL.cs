@@ -6,7 +6,7 @@ namespace FileMqBroker.Tests.MqLibrary.Mocks.DAL;
 /// <summary>
 /// 
 /// </summary>
-public class MockMessageFileDAL : MessageFileDAL
+public class MockMessageFileDAL : SqliteMessageFileDAL
 {
     /// <summary>
     /// Default constructor.
