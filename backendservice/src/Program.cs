@@ -27,7 +27,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         {
             return new AppInitConfigs
             {
-                DbConnectionString = $"Data Source={dbPath};Version=3;",
+                // DbConnectionString = $"Data Source={dbPath};Version=3;",
+                DbConnectionString = $"Server=localhost;Database=filemqbroker;User Id=postgres;Password=postgres;",
                 RequestDirectoryName = reqPath,
                 ResponseDirectoryName = respPath,
                 OneTimeProcQueueElements = 20_000,
@@ -54,8 +55,10 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IWriteAdapter, FileMqWriteAdapter>();
 
         // DAL objects.
-        services.AddSingleton<IMessageFileDAL, SqliteMessageFileDAL>();
-        services.AddSingleton<IExceptionDAL, SqliteExceptionDAL>();
+        services.AddSingleton<IMessageFileDAL, PostgresMessageFileDAL>();
+        services.AddSingleton<IExceptionDAL, PostgresExceptionDAL>();
+        // services.AddSingleton<IMessageFileDAL, SqliteMessageFileDAL>();
+        // services.AddSingleton<IExceptionDAL, SqliteExceptionDAL>();
 
         // Directory operations.
         services.AddSingleton<FileHandler>();
