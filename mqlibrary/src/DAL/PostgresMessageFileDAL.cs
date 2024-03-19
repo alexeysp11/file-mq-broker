@@ -13,12 +13,13 @@ namespace FileMqBroker.MqLibrary.DAL;
 public class PostgresMessageFileDAL : IMessageFileDAL
 {
     #region Private fields
+    private object m_obj = new object();
     private readonly string m_connectionString;
     private readonly string m_requestMessageFiles = "RequestMessageFiles";
     private readonly string m_responseMessageFiles = "ResponseMessageFiles";
-    private readonly string m_defaultSelectAllSQL = "SELECT m.Name, m.HttpMethod, m.HttpPath, m.MessageFileState FROM {0} m ";
-    private readonly string m_defaultInsertMessageSQL = "INSERT INTO {0} (Name, HttpMethod, HttpPath, MessageFileState) VALUES ";
-    private readonly string m_defaultUpdateOldMessageSQL = "update RequestMessageFiles set MessageFileState = 6 where MessageFileState not in (6, 8, 9, 10, 11, 12) and CreatedAt < now() - interval '5 second';";
+    private readonly string m_selectAllSQL = "SELECT m.Name, m.HttpMethod, m.HttpPath, m.MessageFileState FROM {0} m ";
+    private readonly string m_insertMessageSQL = "INSERT INTO {0} (Name, HttpMethod, HttpPath, MessageFileState) VALUES ";
+    private readonly string m_updateOldMessageSQL = "update RequestMessageFiles set MessageFileState = 6 where MessageFileState not in (6, 8, 9, 10, 11, 12) and CreatedAt < now() - interval '5 second';";
     #endregion  // Private fields
 
     #region Constructors
@@ -44,22 +45,29 @@ public class PostgresMessageFileDAL : IMessageFileDAL
         
         var sqlQuery = GenerateInsertSqlByFileMessages(fileMessages);
 
-        using (var connection = new NpgsqlConnection(m_connectionString))
+        lock (m_obj)
         {
-            connection.Execute(sqlQuery.Query, sqlQuery.Parameters);
+            using (var connection = new NpgsqlConnection(m_connectionString))
+            {
+                connection.Execute(sqlQuery.Query, sqlQuery.Parameters);
+            }
         }
     }
 
     /// <summary>
     /// Method for updating state of old files.
     /// </summary>
+    /// <remarks>This optimization is used for those files that take too long to process on the backend side.</remarks>
     public virtual void UpdateOldMessageFileState()
     {
-        var sqlQuery = m_defaultUpdateOldMessageSQL;
+        var sqlQuery = m_updateOldMessageSQL;
 
-        using (var connection = new NpgsqlConnection(m_connectionString))
+        lock (m_obj)
         {
-            connection.Execute(sqlQuery);
+            using (var connection = new NpgsqlConnection(m_connectionString))
+            {
+                connection.Execute(sqlQuery);
+            }
         }
     }
 
@@ -75,9 +83,12 @@ public class PostgresMessageFileDAL : IMessageFileDAL
         
         var sqlQuery = GenerateUpdateSqlByFileNames(fileMessages);
 
-        using (var connection = new NpgsqlConnection(m_connectionString))
+        lock (m_obj)
         {
-            connection.Execute(sqlQuery.Query, sqlQuery.Parameters);
+            using (var connection = new NpgsqlConnection(m_connectionString))
+            {
+                connection.Execute(sqlQuery.Query, sqlQuery.Parameters);
+            }
         }
     }
 
@@ -109,7 +120,7 @@ public class PostgresMessageFileDAL : IMessageFileDAL
         for (int i = 0; i < fileMessages.Count; i++)
         {
             var messageFileType = fileMessages[i].MessageFileType;
-            stringBuilder.Append(string.Format(m_defaultInsertMessageSQL, (messageFileType == MessageFileType.Request ? m_requestMessageFiles : m_responseMessageFiles)));
+            stringBuilder.Append(string.Format(m_insertMessageSQL, (messageFileType == MessageFileType.Request ? m_requestMessageFiles : m_responseMessageFiles)));
             stringBuilder.Append($"(@file_{i}_Name, @file_{i}_HttpMethod, @file_{i}_HttpPath, @file_{i}_FileState);");
 
             queryParameters.Add($"file_{i}_Name", fileMessages[i].Name);
@@ -152,7 +163,7 @@ public class PostgresMessageFileDAL : IMessageFileDAL
             throw new System.ArgumentException("Page number should be greater than zero", nameof(pageNumber));
         
         var stringBuilder = new StringBuilder();
-        stringBuilder.Append(string.Format(m_defaultSelectAllSQL, (messageFileType == MessageFileType.Request ? m_requestMessageFiles : m_responseMessageFiles)));
+        stringBuilder.Append(string.Format(m_selectAllSQL, (messageFileType == MessageFileType.Request ? m_requestMessageFiles : m_responseMessageFiles)));
         stringBuilder.Append(" WHERE m.MessageFileState = 6");
         stringBuilder.Append($" LIMIT {pageSize} OFFSET {pageSize * (pageNumber - 1)};");
 

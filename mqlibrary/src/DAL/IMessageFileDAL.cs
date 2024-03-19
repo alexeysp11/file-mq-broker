@@ -17,6 +17,7 @@ public interface IMessageFileDAL
     /// <summary>
     /// Method for updating state of old files.
     /// </summary>
+    /// <remarks>This optimization is used for those files that take too long to process on the backend side.</remarks>
     void UpdateOldMessageFileState();
 
     /// <summary>
