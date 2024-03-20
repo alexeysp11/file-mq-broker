@@ -32,6 +32,16 @@ A more detailed diagram demonstrating how a file message broker works is present
 - Replies can be quite separated in time from the response, so that one of the callers waiting for a response can forcefully close the connection without waiting for a response.
 - Broker settings in the config file (storage directory).
 
+## Pre-initialization of the environment
+
+1. Initialize the `data` folder, which contains the data that is generated as part of the application execution:
+```
+initdatafolder.cmd
+```
+2. Initialize the database:
+     - If you intend to use SQLite, then you need to open the database file `data/db/test.db` and execute the commands that are in the file `sql/sqlite/create.sql`. In order to open the database, you can use the batch file `opentestdb.cmd`.
+     - If you plan to use PostgreSQL, then you need to create a `filemqbroker` database and run the commands that are in the `sql/postgres/create.sql` file.
+
 ## Testing
 
 ### How it could be tested
