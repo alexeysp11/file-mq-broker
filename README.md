@@ -32,6 +32,8 @@ A more detailed diagram demonstrating how a file message broker works is present
 - Replies can be quite separated in time from the response, so that one of the callers waiting for a response can forcefully close the connection without waiting for a response.
 - Broker settings in the config file (storage directory).
 
+## Testing
+
 ### How it could be tested
 
 - A load of 10-20 thousand requests will be created, in batches based on the identity of the key; various responses to batches of queries will also be created in the background and the results will be analyzed.
@@ -42,3 +44,15 @@ A more detailed diagram demonstrating how a file message broker works is present
 - (not critical) Availability of unit tests.
 - (not critical) the presence of load tests and benchmarks.
 - Code readability.
+
+### How to run tests
+
+To run tests, you need to run two instances of the application:
+1. Load generation application:
+```
+runloadtesting.cmd
+```
+2. Application for processing a request on the backend service:
+```
+runbackendservice.cmd
+```
