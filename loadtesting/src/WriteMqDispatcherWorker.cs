@@ -4,14 +4,14 @@ namespace FileMqBroker.MqLibrary.LoadTesting;
 
 public class WriteMqDispatcherWorker : BackgroundService
 {
-    private readonly ILogger<WriteMqDispatcherWorker> _logger;
+    private readonly ILogger<WriteMqDispatcherWorker> m_logger;
     private IMqDispatcher m_dispatcher;
 
     public WriteMqDispatcherWorker(
         ILogger<WriteMqDispatcherWorker> logger,
         WriteMqDispatcher dispatcher)
     {
-        _logger = logger;
+        m_logger = logger;
         m_dispatcher = dispatcher;
     }
 
@@ -19,9 +19,16 @@ public class WriteMqDispatcherWorker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("WriteMqDispatcherWorker running at: {time}", DateTimeOffset.Now);
-            m_dispatcher.ProcessMessageQueue();
-            await Task.Delay(1000, stoppingToken);
+            try
+            {
+                m_logger.LogInformation("WriteMqDispatcherWorker running at: {time}", DateTimeOffset.Now);
+                m_dispatcher.ProcessMessageQueue();
+                await Task.Delay(1000, stoppingToken);
+            }
+            catch (System.Exception ex)
+            {
+                m_logger.LogError(ex.ToString());
+            }
         }
     }
 }

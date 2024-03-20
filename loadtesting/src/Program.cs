@@ -73,7 +73,7 @@ public class Program
         {
             return new LoadConfigParams
             {
-                DeltaMax = 100
+                DeltaMax = 10000
             };
         });
 
