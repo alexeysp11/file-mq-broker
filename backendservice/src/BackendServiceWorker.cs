@@ -33,9 +33,16 @@ public class BackendServiceWorker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            m_logger.LogInformation("BackendServiceWorker running at: {time}", DateTimeOffset.Now);
-            m_readAdapter.ReadMessageQueue();
-            await Task.Delay(1000, stoppingToken);
+            try
+            {
+                m_logger.LogInformation("BackendServiceWorker running at: {time}", DateTimeOffset.Now);
+                m_readAdapter.ReadMessageQueue();
+                await Task.Delay(1000, stoppingToken);
+            }
+            catch (System.Exception ex)
+            {
+                m_logger.LogError(ex.ToString());
+            }
         }
     }
 }
