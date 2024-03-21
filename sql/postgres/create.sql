@@ -32,3 +32,6 @@ CREATE TABLE ExceptionLog (
     StackTrace TEXT,
     Timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS RequestMessageFiles_Name_Inx ON RequestMessageFiles (Name);
+CREATE INDEX IF NOT EXISTS ResponseMessageFiles_Name_Inx ON ResponseMessageFiles (Name);
