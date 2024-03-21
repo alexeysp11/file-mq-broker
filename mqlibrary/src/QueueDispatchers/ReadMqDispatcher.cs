@@ -47,7 +47,8 @@ public class ReadMqDispatcher : IMqDispatcher
     /// </summary>
     public void ProcessMessageQueue()
     {
-        // 
+        // Update the status of old messages so they can be read and removed from the directory.
+        // Get files from the database that can be processed.
         m_messageFileDAL.UpdateOldMessageFileState();
         var fileMessages = m_messageFileDAL.GetMessageFileInfo(20_000, 1, m_messageFileType);
         if (fileMessages == null)
