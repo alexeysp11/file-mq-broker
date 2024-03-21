@@ -19,7 +19,7 @@ public class SqliteMessageFileDAL : IMessageFileDAL
     private readonly string m_responseMessageFiles = "ResponseMessageFiles";
     private readonly string m_selectAllSQL = "SELECT m.Name, m.HttpMethod, m.HttpPath, m.MessageFileState FROM {0} m ";
     private readonly string m_insertMessageSQL = "INSERT INTO {0} (Name, HttpMethod, HttpPath, MessageFileState) VALUES ";
-    private readonly string m_updateOldMessageSQL = "update RequestMessageFiles set MessageFileState = 6 where MessageFileState not in (6, 8, 9, 10, 11, 12) and CreatedAt < datetime('now', '-5 seconds');";
+    private readonly string m_updateOldMessageSQL = "update RequestMessageFiles set MessageFileState = 6 where MessageFileState not in (6, 11, 12) and CreatedAt < datetime('now', '-5 seconds');";
     #endregion  // Private fields
 
     #region Constructors
